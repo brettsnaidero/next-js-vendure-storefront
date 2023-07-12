@@ -195,7 +195,7 @@ const EditAddressCard = ({ address, refetch }: EditAddressProps) => {
                 size="small"
                 role="secondary"
               >
-                Set as default shipping address
+                Make default shipping address
               </Button>
             )}
             {!address.defaultBillingAddress && (
@@ -214,7 +214,7 @@ const EditAddressCard = ({ address, refetch }: EditAddressProps) => {
                 size="small"
                 role="secondary"
               >
-                Set as default billing address
+                Make default billing address
               </Button>
             )}
           </ButtonTray>

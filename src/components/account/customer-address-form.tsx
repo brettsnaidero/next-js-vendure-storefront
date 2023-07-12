@@ -9,6 +9,7 @@ import { useForm } from 'react-hook-form';
 import Button, { ButtonTray } from '@/components/button';
 import Input from '@/components/form/input';
 import Field from '@/components/form/field';
+import styles from '@/styles/components/address-form.module.css';
 
 export const validator = z.object({
   fullName: z.string().min(1, { message: 'Name is required' }),
@@ -101,97 +102,100 @@ const CustomerAddressForm = ({
           stretched
         />
       </Field>
-      <Field
-        label="Address"
-        htmlFor="edit-address-form__address-line1"
-        errorMessage={errors.streetLine1?.message}
-        required
-      >
-        <Input
-          type="text"
-          id="edit-address-form__address-line1"
-          autoComplete="address-line1"
-          {...register('streetLine1', { required: true })}
-          stretched
-        />
-      </Field>
 
-      <Field
-        label="Apartment, suite, etc."
-        htmlFor="edit-address-form__address-line2"
-        errorMessage={errors.streetLine2?.message}
-      >
-        <Input
-          type="text"
-          id="edit-address-form__address-line2"
-          autoComplete="address-line2"
-          {...register('streetLine2')}
-          stretched
-        />
-      </Field>
+      <div className={styles.form}>
+        <Field
+          label="Address"
+          htmlFor="edit-address-form__address-line1"
+          errorMessage={errors.streetLine1?.message}
+          required
+        >
+          <Input
+            type="text"
+            id="edit-address-form__address-line1"
+            autoComplete="address-line1"
+            {...register('streetLine1', { required: true })}
+            stretched
+          />
+        </Field>
 
-      <Field
-        label="Postal code"
-        htmlFor="edit-address-form__postal-code"
-        errorMessage={errors.postalCode?.message}
-        required
-      >
-        <Input
-          type="text"
-          id="edit-address-form__postal-code"
-          autoComplete="postal-code"
-          {...register('postalCode', { required: true })}
-          stretched
-        />
-      </Field>
+        <Field
+          label="Apartment, suite, etc."
+          htmlFor="edit-address-form__address-line2"
+          errorMessage={errors.streetLine2?.message}
+        >
+          <Input
+            type="text"
+            id="edit-address-form__address-line2"
+            autoComplete="address-line2"
+            {...register('streetLine2')}
+            stretched
+          />
+        </Field>
 
-      <Field
-        label="City"
-        htmlFor="edit-address-form__city"
-        errorMessage={errors.city?.message}
-        required
-      >
-        <Input
-          type="text"
-          id="edit-address-form__city"
-          autoComplete="locality"
-          {...register('city', { required: true })}
-          stretched
-        />
-      </Field>
+        <Field
+          label="Postal code"
+          htmlFor="edit-address-form__postal-code"
+          errorMessage={errors.postalCode?.message}
+          required
+        >
+          <Input
+            type="text"
+            id="edit-address-form__postal-code"
+            autoComplete="postal-code"
+            {...register('postalCode', { required: true })}
+            stretched
+          />
+        </Field>
 
-      <Field
-        label="Province / State"
-        htmlFor="edit-address-form__province"
-        errorMessage={errors.province?.message}
-      >
-        <Input
-          type="text"
-          id="edit-address-form__province"
-          autoComplete="address-level1"
-          {...register('province')}
-          stretched
-        />
-      </Field>
+        <Field
+          label="City"
+          htmlFor="edit-address-form__city"
+          errorMessage={errors.city?.message}
+          required
+        >
+          <Input
+            type="text"
+            id="edit-address-form__city"
+            autoComplete="locality"
+            {...register('city', { required: true })}
+            stretched
+          />
+        </Field>
 
-      <Field
-        label="Country"
-        htmlFor="edit-address-form__country"
-        errorMessage={errors.countryCode?.message}
-        required
-      >
-        <Select
-          autoComplete="country"
-          id="edit-address-form__country"
-          placeholder="Select a country..."
-          options={availableCountries?.map((country) => ({
-            label: country.name,
-            value: country.code,
-          }))}
-          {...register('countryCode', { required: true })}
-          stretched
-        />
-      </Field>
+        <Field
+          label="Province / State"
+          htmlFor="edit-address-form__province"
+          errorMessage={errors.province?.message}
+        >
+          <Input
+            type="text"
+            id="edit-address-form__province"
+            autoComplete="address-level1"
+            {...register('province')}
+            stretched
+          />
+        </Field>
+
+        <Field
+          label="Country"
+          htmlFor="edit-address-form__country"
+          errorMessage={errors.countryCode?.message}
+          required
+        >
+          <Select
+            autoComplete="country"
+            id="edit-address-form__country"
+            placeholder="Select a country..."
+            options={availableCountries?.map((country) => ({
+              label: country.name,
+              value: country.code,
+            }))}
+            {...register('countryCode', { required: true })}
+            stretched
+          />
+        </Field>
+      </div>
 
       <Field
         label="Phone"
@@ -207,11 +211,11 @@ const CustomerAddressForm = ({
         />
       </Field>
 
-      <ButtonTray>
-        {children}
+      <ButtonTray align="right">
         <Button type="submit" disabled={!isValid}>
           Submit
         </Button>
+        {children}
       </ButtonTray>
     </form>
   );

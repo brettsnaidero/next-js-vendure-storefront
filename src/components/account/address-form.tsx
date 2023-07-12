@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import Select from '@/components/form/select';
 import Input from '@/components/form/input';
 import Field from '@/components/form/field';
+import styles from '@/styles/components/address-form.module.css';
 
 export interface ShippingForm {
   fullName?: string;
@@ -52,6 +53,7 @@ const AddressForm = ({
 
   return (
     <form
+      className={styles.form}
       onBlur={handleSubmit(onChange)}
       onChange={() => setAddressFormChanged(true)}
     >

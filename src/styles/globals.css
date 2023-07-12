@@ -39,8 +39,24 @@
   --border-radius-m: 8px;
   --border-radius-l: 12px;
 
-  --colour-interactive-background: #1668dc;
+  /* Colours that are the same in both themes */
+  --colour-radio-background: #1668dc;
+  --colour-radio: #ffffff;
+
+  --colour-text-link: #4252db;
+  --colour-brand: #4252db;
+
+  --colour-interactive-background: #4252db;
+  --colour-interactive-hover: #2c3ab5;
   --colour-interactive: #ffffff;
+
+  --colour-interactive-negative-background: #c1424c;
+  --colour-interactive-negative-hover: #ab303b;
+  --colour-interactive-negative: #ffffff;
+
+  --colour-interactive-secondary-background: #ffffff;
+  --colour-interactive-secondary-hover: #f2f1ee;
+  --colour-interactive-secondary: #27272c;
 }
 
 /* TODO: Set up PostCSS mixin plugin to avoid having 2 sets of theme variables */
@@ -51,14 +67,13 @@
   --colour-outline: #b5b4b0;
   --colour-text: #27272c;
   --colour-text-secondary: #757471;
-  --colour-text-link: #27272c;
-  --colour-brand: #a1cce6;
 
-  --colour-input-background: #ffffff;
-  --colour-input-border: #cccccc;
   --colour-button-text: #27272c;
   --colour-button-disabled: #dfdfdd;
   --colour-button-text-disabled: #bdbdbb;
+
+  --colour-input-background: #ffffff;
+  --colour-input-border: #cccccc;
 
   --colour-success: #f6ffed;
   --colour-success-border: #b7eb8f;
@@ -78,8 +93,6 @@ html.light {
   --colour-outline: #b5b4b0;
   --colour-text: #27272c;
   --colour-text-secondary: #757471;
-  --colour-text-link: #27272c;
-  --colour-brand: #a1cce6;
 
   --colour-input-background: #ffffff;
   --colour-input-border: #cccccc;
@@ -112,8 +125,6 @@ html.light {
     --colour-outline: #464651;
     --colour-text: #ffffff;
     --colour-text-secondary: #757471;
-    --colour-text-link: #476fbb;
-    --colour-brand: #476fbb;
 
     --colour-input-background: #000000;
     --colour-input-border: #464651;
@@ -143,8 +154,6 @@ html.dark {
   --colour-outline: #464651;
   --colour-text: #ffffff;
   --colour-text-secondary: #ccc;
-  --colour-text-link: #476fbb;
-  --colour-brand: #476fbb;
 
   --colour-input-background: #000000;
   --colour-input-border: #464651;
@@ -176,7 +185,6 @@ html.dark {
 html,
 body {
   overflow-x: hidden;
-  font-family: 'Roboto', sans-serif;
 }
 
 body {

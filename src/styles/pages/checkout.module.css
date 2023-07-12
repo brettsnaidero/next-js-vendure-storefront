@@ -14,16 +14,10 @@
   grid-gap: var(--spacing-l);
 }
 
-@media (min-width: 600px) {
-  .layout {
-    grid-template-columns: 1fr minmax(150px, 50%);
-  }
-}
-
 @media (min-width: 720px) {
   .layout {
     display: grid;
-    grid-template-columns: 1fr minmax(300px, 33.3%);
+    grid-template-columns: 1fr minmax(292px, 33.3%);
     grid-gap: var(--spacing-l);
   }
 }
@@ -61,7 +55,7 @@
 
 /* Progress */
 .progress {
-  margin-bottom: var(--spacing-m);
+  margin-bottom: var(--spacing-l);
 }
 
 .progress ol {
@@ -72,6 +66,8 @@
 .progress ol li {
   display: flex;
   align-items: center;
+  font-size: var(--font-size-s);
+  line-height: var(--line-height-s);
   color: var(--colour-text-secondary);
 }
 

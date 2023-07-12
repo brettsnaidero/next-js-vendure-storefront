@@ -15,18 +15,18 @@ const Field = ({
   required?: boolean;
 }) => (
   <div className={styles.field}>
-    {label && (
+    {label ? (
       <label htmlFor={htmlFor} className={styles.label}>
         {label}
         {required ? <span className={styles.required}> *</span> : null}
       </label>
-    )}
+    ) : null}
     {children}
-    {errorMessage && (
+    {errorMessage ? (
       <div className={styles.warning}>
         <Message type="warning" text={errorMessage} />
       </div>
-    )}
+    ) : null}
   </div>
 );
 

@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Link from 'next/link';
 import clsx from 'clsx';
 import SearchBar from '@/components/header/search-bar';
@@ -21,6 +21,7 @@ const Header = ({
   cartQuantity: number;
   collections: CollectionsQuery['collections']['items'];
 }) => {
+  const [showThemeToggle, setShowThemeToggle] = useState(false);
   const { activeCustomer } = useContext(ActiveCustomerContext);
   const isSignedIn = !!activeCustomer?.id;
   const isScrollingUp = useScrollingUp();
@@ -31,6 +32,11 @@ const Header = ({
     const newTheme = theme === Theme.Light ? Theme.Dark : Theme.Light;
     toggleTheme(newTheme);
   };
+
+  // Client side only
+  useEffect(() => {
+    setShowThemeToggle(true);
+  }, []);
 
   return (
     <header className={clsx([styles.header, isScrollingUp ? 'sticky' : ''])}>
@@ -44,7 +50,8 @@ const Header = ({
         </Link>
 
         <AnimatePresence>
-          {theme === Theme.Dark || theme === Theme.Light ? (
+          {showThemeToggle &&
+          (theme === Theme.Dark || theme === Theme.Light) ? (
             <motion.button
               type="button"
               onClick={() => toggleDarkMode()}

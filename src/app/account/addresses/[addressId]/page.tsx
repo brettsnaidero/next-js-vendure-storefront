@@ -17,7 +17,6 @@ import { ActiveCustomerAddressesQuery } from '@/providers/customer/customer';
 import { useRouter } from 'next/navigation';
 import { useSuspenseQuery } from '@apollo/experimental-nextjs-app-support/ssr';
 
-// TODO: Should this be a page? It seems to be a component
 const EditAddress = ({ params }: { params: { addressId: string } }) => {
   const router = useRouter();
 

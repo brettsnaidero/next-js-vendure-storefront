@@ -5,39 +5,78 @@
   height: 42px;
   line-height: 40px;
   border-radius: 21px;
-  border: 1px solid var(--colour-brand);
   padding: 0 var(--spacing-m);
-  background-color: var(--colour-brand);
-  color: var(--colour-button-text);
+  background-color: var(--colour-interactive-background);
+  border: 1px solid var(--colour-interactive-background);
+  color: var(--colour-interactive);
   text-align: center;
   transition: background-color 0.3s,
     box-shadow 0.3s cubic-bezier(0.75, 0.5, 0.75, 2);
   cursor: pointer;
   font-size: var(--font-size-s);
+  white-space: nowrap;
 }
 
+.button:hover {
+  background-color: var(--colour-interactive-hover);
+  border-color: var(--colour-interactive-hover);
+  color: var(--colour-interactive);
+}
+
+.button:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--colour-interactive-hover);
+  color: var(--colour-interactive);
+}
+
+/* Secondary */
 .button.secondary {
-  background-color: var(--colour-input-background);
-  border-color: var(--colour-input-border);
-  color: var(--colour-text);
+  background-color: var(--colour-interactive-secondary-background);
+  border-color: var(--colour-interactive-secondary-background);
+  color: var(--colour-interactive-secondary);
 }
 
+.button.secondary:hover {
+  background-color: var(--colour-interactive-secondary-hover);
+  border-color: var(--colour-interactive-secondary-hover);
+  color: var(--colour-interactive-secondary);
+}
+
+.button.secondary:focus {
+  box-shadow: 0 0 0 2px var(--colour-interactive-secondary-hover);
+  color: var(--colour-interactive-secondary);
+}
+
+/* Negative */
 .button.negative {
-  background-color: var(--colour-error);
-  border-color: var(--colour-error-border);
-  color: var(--colour-button-text);
+  background-color: var(--colour-interactive-negative-background);
+  border-color: var(--colour-interactive-negative-background);
+  color: var(--colour-interactive-negative);
 }
 
-.button:disabled {
+.button.negative:hover {
+  background-color: var(--colour-interactive-negative-hover);
+  border-color: var(--colour-interactive-negative-hover);
+  color: var(--colour-interactive-negative);
+}
+
+.button.negative:focus {
+  box-shadow: 0 0 0 2px var(--colour-interactive-negative-hover);
+  color: var(--colour-interactive-negative);
+}
+
+/* Disabled */
+.button:disabled,
+.button:disabled:hover,
+.button:disabled:focus {
   background-color: var(--colour-button-disabled);
   border-color: var(--colour-button-disabled);
   color: var(--colour-button-text-disabled);
   cursor: not-allowed;
+  box-shadow: 0;
 }
 
-.button:hover {
-}
-
+/* Sizes */
 .button.small {
   height: 32px;
   line-height: 30px;
@@ -72,7 +111,7 @@
   display: block;
   width: 20px;
   height: 20px;
-  color: var(--colour-button-text);
+  color: currentColor;
 }
 
 .left.beside {
@@ -94,10 +133,12 @@
 /* Tray */
 .tray {
   display: flex;
+  flex-wrap: wrap;
+  margin: calc(-1 * var(--spacing-xs)) 0;
 }
 
 .tray > * {
-  margin-right: var(--spacing-s);
+  margin: var(--spacing-xs) var(--spacing-s) var(--spacing-xs) 0;
 }
 
 .tray.right {
@@ -105,6 +146,5 @@
 }
 
 .tray.right > * {
-  margin-right: 0;
-  margin-left: var(--spacing-s);
+  margin: var(--spacing-xs) 0 var(--spacing-xs) var(--spacing-s);
 }

@@ -83,7 +83,7 @@ const Footer = ({ collections }: { collections: any[] }) => {
         <div>
           <h3>Subscribe to our newsletter</h3>
           <p>Be the first to know about exclusive offers & deals.</p>
-          <form className={styles.subscribe} onSubmit={handleSubmit(onSubmit)}>
+          <form className={styles.subscribe}>
             <Field
               label="Email address"
               htmlFor="subscribe__email-address"

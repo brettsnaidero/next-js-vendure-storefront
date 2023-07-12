@@ -54,7 +54,7 @@
 
 input:hover + .check,
 input:focus + .check {
-  border-color: 1px solid var(--colour-interactive-background);
+  border-color: 1px solid var(--colour-radio-background);
 }
 
 .check:after {
@@ -77,11 +77,11 @@ input:focus + .check {
 }
 
 input:checked + .check {
-  background-color: var(--colour-interactive-background);
+  background-color: var(--colour-radio-background);
 }
 
 input:checked + .check:after {
-  border-color: var(--colour-interactive);
+  border-color: var(--colour-radio);
   opacity: 1;
   transform: rotate(45deg) scale(1);
   transition: all 0.2s cubic-bezier(0.12, 0.4, 0.29, 1.46) 0.1s;
@@ -110,7 +110,7 @@ input:checked + .check:after {
 
 input:hover + .dot,
 input:focus + .dot {
-  border-color: 1px solid var(--colour-interactive-background);
+  border-color: 1px solid var(--colour-radio-background);
 }
 
 .dot:after {
@@ -126,12 +126,12 @@ input:focus + .dot {
 }
 
 input:checked + .dot {
-  border-color: var(--colour-interactive-background);
-  background-color: var(--colour-interactive-background);
+  border-color: var(--colour-radio-background);
+  background-color: var(--colour-radio-background);
 }
 
 input:checked + .dot:after {
-  background-color: var(--colour-interactive);
+  background-color: var(--colour-radio);
 }
 
 /* Select */

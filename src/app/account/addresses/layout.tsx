@@ -9,6 +9,7 @@ import { ActiveCustomerAddressesQuery as ActiveCustomerAddressesQueryType } from
 import { useSuspenseQuery } from '@apollo/experimental-nextjs-app-support/ssr';
 import { PlusIcon } from '@heroicons/react/24/solid';
 import { LinkButton } from '@/components/button';
+import Message from '@/components/message';
 
 const AccountAddresses = ({ children }: { children: React.ReactNode }) => {
   const { data, error, refetch } =
@@ -17,7 +18,7 @@ const AccountAddresses = ({ children }: { children: React.ReactNode }) => {
     );
 
   if (error) {
-    return <div>Error</div>;
+    return <Message type="error" text="There was an unexpected error" />;
   }
 
   return (
