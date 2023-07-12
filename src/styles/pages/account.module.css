@@ -89,6 +89,7 @@
   font-size: var(--font-size-s);
   line-height: var(--line-height-s);
   color: var(--colour-text-secondary);
+  margin-bottom: var(--spacing-m);
 }
 
 .pagination strong {

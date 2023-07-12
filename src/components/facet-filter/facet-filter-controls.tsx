@@ -45,7 +45,9 @@ const FacetFilterControls = ({
     const search = current.toString();
     const query = `${'?'.repeat(search.length && 1)}${search}`;
 
-    router.push(`${pathname}${query}`);
+    router.push(`${pathname}${query}`, {
+      scroll: false,
+    });
   };
 
   return (

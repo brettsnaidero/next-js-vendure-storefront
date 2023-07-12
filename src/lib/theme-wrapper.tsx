@@ -35,9 +35,9 @@ const ThemeInnerWrapper = ({ children }: { children: React.ReactNode }) => {
 const ThemeWrapper = ({ children }: { children: React.ReactNode }) => (
   <ThemeProvider
     attribute="class"
-    defaultTheme="system"
-    enableSystem={false}
-    themes={['light', 'dark']}
+    defaultTheme={Theme.Light}
+    enableSystem={true}
+    themes={[Theme.Light, Theme.Dark]}
   >
     <ThemeInnerWrapper>{children}</ThemeInnerWrapper>
   </ThemeProvider>

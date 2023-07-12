@@ -54,6 +54,25 @@ const AccountHistory = () => {
 
   return (
     <div>
+      <div className={styles.pagination}>
+        Showing orders{' '}
+        <strong>
+          {translatePaginationFrom(
+            appliedPaginationPage,
+            appliedPaginationLimit,
+          )}
+        </strong>{' '}
+        to{' '}
+        <strong>
+          {translatePaginationTo(
+            appliedPaginationPage,
+            appliedPaginationLimit,
+            data.activeCustomer.orders.totalItems,
+          )}
+        </strong>{' '}
+        of <strong>{data.activeCustomer.orders.totalItems}</strong>
+      </div>
+
       {data.activeCustomer.orders.items.length === 0 && (
         <div className={styles.nothing}>
           {data.activeCustomer.orders.totalItems === 0
@@ -68,25 +87,6 @@ const AccountHistory = () => {
 
       {/* Pagination */}
       <div>
-        <div className={styles.pagination}>
-          Showing orders{' '}
-          <strong>
-            {translatePaginationFrom(
-              appliedPaginationPage,
-              appliedPaginationLimit,
-            )}
-          </strong>{' '}
-          to{' '}
-          <strong>
-            {translatePaginationTo(
-              appliedPaginationPage,
-              appliedPaginationLimit,
-              data.activeCustomer.orders.totalItems,
-            )}
-          </strong>{' '}
-          of <strong>{data.activeCustomer.orders.totalItems}</strong>
-        </div>
-
         <Pagination
           basePath="/account/history"
           totalItems={data.activeCustomer.orders.totalItems}
