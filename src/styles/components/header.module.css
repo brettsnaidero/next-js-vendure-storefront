@@ -69,7 +69,17 @@
   height: 30px;
   line-height: 30px;
   display: flex;
+  align-items: center;
   cursor: pointer;
+  white-space: nowrap;
+}
+
+.theme svg {
+  margin-right: var(--spacing-xs);
+  display: block;
+  width: 16px;
+  height: 16px;
+  color: var(--colour-text-secondary);
 }
 
 /* Main */

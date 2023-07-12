@@ -47,4 +47,5 @@
 }
 
 .subscribe {
+  margin-top: var(--spacing-m);
 }

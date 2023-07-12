@@ -5,7 +5,7 @@ import SearchBar from '@/components/header/search-bar';
 import Button from '@/components/button';
 import { useScrollingUp } from '@/utils/use-scrolling-up';
 import { ShoppingBagIcon } from '@heroicons/react/24/outline';
-import { UserIcon } from '@heroicons/react/24/solid';
+import { SunIcon, MoonIcon, UserIcon } from '@heroicons/react/24/solid';
 import { CollectionsQuery } from '@/graphql-types.generated';
 import styles from '@/styles/components/header.module.css';
 import { ThemeContext, Theme } from '@/lib/theme-wrapper';
@@ -47,19 +47,18 @@ const Header = ({
           onClick={() => toggleDarkMode()}
           className={styles.theme}
         >
-          {theme === 'dark' ? 'Light mode' : 'Dark mode'}
+          {theme === 'dark' ? (
+            <SunIcon width={20} height={20} />
+          ) : (
+            <MoonIcon width={20} height={20} />
+          )}
+          {theme === 'dark' ? 'Light' : 'Dark'} mode
         </button>
       </div>
 
       <div className={styles.main}>
         <h1 className={styles.logo}>
           <Link href="/" className={styles.link}>
-            {/* <Image
-              src="/cube-logo-small.webp"
-              width={40}
-              height={31}
-              alt="Company name"
-            /> */}
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 48.77 46.886"
