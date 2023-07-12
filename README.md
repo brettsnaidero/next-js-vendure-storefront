@@ -10,6 +10,7 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 - [Apollo](https://www.apollographql.com/)
 - [Framer Motion](https://www.framer.com/motion/)
 - [Ant design](https://ant.design/)
+- [Next Themes](https://github.com/pacocoursey/next-themes)
 
 ## Styling
 
@@ -101,3 +102,4 @@ Here are some things which could be improved:
 
 - Metadata generation for pages (eg. page title and description)
 - Audit and consolidate data fetching (eg. using GraphQL fragments to minimise requests)
+- Tab component used on account pages is not responsive
