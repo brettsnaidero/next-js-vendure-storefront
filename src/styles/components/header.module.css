@@ -93,6 +93,14 @@
   margin: var(--spacing-s) auto;
 }
 
+.logo img,
+.logo svg {
+  display: block;
+  color: var(--colour-text);
+  max-width: 68px;
+  height: auto;
+}
+
 .link {
   display: block;
 }

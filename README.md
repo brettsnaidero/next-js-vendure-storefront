@@ -1,8 +1,34 @@
+# Next.js / Vendure storefront
+
+An e-commerce storefront for [Vendure](https://www.vendure.io/) built with [Next.js](https://nextjs.org/).
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+
+## Dependencies / technologies
+
+- [Typescript](https://www.typescriptlang.org/)
+- [Apollo](https://www.apollographql.com/)
+- [Framer Motion](https://www.framer.com/motion/)
+- [Ant design](https://ant.design/)
+
+## Styling
+
+Styling for the project uses PostCSS and CSS Modules.
 
 ## Getting Started
 
-First, run the development server:
+Create a `.env` file in the root dir with the following contents:
+
+```.env
+NEXT_PUBLIC_VENDURE_SHOP_API=http://localhost:3001/shop-api
+# or
+# NEXT_PUBLIC_VENDURE_SHOP_API=https://readonlydemo.vendure.io/shop-api
+AUTH_TOKEN_KEY=
+COOKIE_SESSION_SECRET=
+STRIPE_PUBLISHABLE_KEY=
+```
+
+Then, run the development server:
 
 ```bash
 npm run dev
@@ -17,6 +43,20 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+
+## Generating types
+
+To generate Typescript types from the Vendure GraphQL API, you can run:
+
+```bash
+npm run generate-types
+# or
+yarn generate-types
+# or
+pnpm generate-types
+```
+
+Generated types will then be available in the `graphql-types.generates.ts` file.
 
 ## Payments
 
@@ -54,3 +94,10 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+## To do
+
+Here are some things which could be improved:
+
+- Metadata generation for pages (eg. page title and description)
+- Audit and consolidate data fetching (eg. using GraphQL fragments to minimise requests)

@@ -1,0 +1,13 @@
+.page {
+  padding: var(--spacing-l) 0;
+}
+
+.page h2 {
+  font-size: var(--font-size-l);
+  line-height: var(--line-height-l);
+  margin-bottom: var(--spacing-m);
+}
+
+.page p {
+  margin-bottom: var(--spacing-m);
+}
