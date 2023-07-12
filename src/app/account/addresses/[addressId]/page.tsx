@@ -15,7 +15,7 @@ import CustomerAddressForm, {
 import { AvailableCountriesQuery } from '@/providers/checkout/checkout';
 import { ActiveCustomerAddressesQuery } from '@/providers/customer/customer';
 import { useRouter } from 'next/navigation';
-import { useSuspenseQuery } from '@apollo/client';
+import { useSuspenseQuery } from '@apollo/experimental-nextjs-app-support/ssr';
 
 // TODO: Should this be a page? It seems to be a component
 const EditAddress = ({ params }: { params: { addressId: string } }) => {

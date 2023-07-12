@@ -10,7 +10,7 @@ import { CollectionsQuery } from '@/graphql-types.generated';
 import styles from '@/styles/components/header.module.css';
 import { ThemeContext, Theme } from '@/lib/theme-wrapper';
 import { ActiveCustomerContext } from '@/lib/active-customer-wrapper';
-import Image from 'next/image';
+import { AnimatePresence, motion } from 'framer-motion';
 
 const Header = ({
   onCartIconClick,
@@ -43,18 +43,26 @@ const Header = ({
           <span>{isSignedIn ? 'My Account' : 'Sign In'}</span>
         </Link>
 
-        <button
-          type="button"
-          onClick={() => toggleDarkMode()}
-          className={styles.theme}
-        >
-          {theme === 'dark' ? (
-            <SunIcon width={20} height={20} />
-          ) : (
-            <MoonIcon width={20} height={20} />
-          )}
-          {theme === 'dark' ? 'Light' : 'Dark'} mode
-        </button>
+        <AnimatePresence>
+          {theme === Theme.Dark || theme === Theme.Light ? (
+            <motion.button
+              type="button"
+              onClick={() => toggleDarkMode()}
+              className={styles.theme}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              key="theme-toggle"
+            >
+              {theme === Theme.Dark ? (
+                <SunIcon width={20} height={20} />
+              ) : (
+                <MoonIcon width={20} height={20} />
+              )}
+              {theme === Theme.Dark ? 'Light' : 'Dark'} mode
+            </motion.button>
+          ) : null}
+        </AnimatePresence>
       </div>
 
       <div className={styles.main}>

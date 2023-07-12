@@ -1,6 +1,6 @@
 'use client';
 
-import { useSuspenseQuery } from '@apollo/client';
+import { useSuspenseQuery } from '@apollo/experimental-nextjs-app-support/ssr';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ActiveCustomerOrderListQuery as ActiveCustomerOrderListQueryType } from '@/graphql-types.generated';
 import { ActiveCustomerOrderListQuery } from '@/providers/customer/customer';

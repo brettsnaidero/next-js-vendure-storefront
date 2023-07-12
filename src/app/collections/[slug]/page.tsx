@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useSuspenseQuery } from '@apollo/client';
+import { useSuspenseQuery } from '@apollo/experimental-nextjs-app-support/ssr';
 import CollectionCard from '@/components/collections/collection-card';
 import Breadcrumbs from '@/components/breadcrumbs';
 import FilterableProductGrid from '@/components/products/filterable-product-grid';

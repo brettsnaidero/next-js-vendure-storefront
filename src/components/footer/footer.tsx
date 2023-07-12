@@ -22,7 +22,11 @@ const navigation = {
 };
 
 const Footer = ({ collections }: { collections: any[] }) => {
-  const { handleSubmit, register } = useForm({
+  const {
+    handleSubmit,
+    register,
+    formState: { errors },
+  } = useForm({
     defaultValues: {
       email: '',
     },
@@ -83,7 +87,7 @@ const Footer = ({ collections }: { collections: any[] }) => {
             <Field
               label="Email address"
               htmlFor="subscribe__email-address"
-              errorMessage={undefined}
+              errorMessage={errors.email?.message}
             >
               <Input
                 type="email"

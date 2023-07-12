@@ -6,7 +6,7 @@ import EditAddressCard from '@/components/account/edit-address-card';
 
 import { ActiveCustomerAddressesQuery } from '@/providers/customer/customer';
 import { ActiveCustomerAddressesQuery as ActiveCustomerAddressesQueryType } from '@/graphql-types.generated';
-import { useSuspenseQuery } from '@apollo/client';
+import { useSuspenseQuery } from '@apollo/experimental-nextjs-app-support/ssr';
 import { PlusIcon } from '@heroicons/react/24/solid';
 import { LinkButton } from '@/components/button';
 

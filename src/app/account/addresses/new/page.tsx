@@ -1,15 +1,14 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Button, { ButtonTray } from '@/components/button';
 import Modal from '@/components/modal/modal';
 import useToggleState from '@/utils/use-toggle-state';
 import CustomerAddressForm, {
   CustomerAddressFormFields,
 } from '@/components/account/customer-address-form';
 import { AvailableCountriesQuery } from '@/providers/checkout/checkout';
-import { useSuspenseQuery } from '@apollo/client';
+import { useSuspenseQuery } from '@apollo/experimental-nextjs-app-support/ssr';
 import {
   AvailableCountriesQuery as AvailableCountriesQueryType,
   useCreateCustomerAddressMutation,

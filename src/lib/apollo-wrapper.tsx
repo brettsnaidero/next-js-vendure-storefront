@@ -1,5 +1,4 @@
 'use client';
-
 import {
   ApolloClient,
   ApolloLink,
@@ -14,63 +13,14 @@ import {
 import { setContext } from '@apollo/client/link/context';
 
 const vendureApi = process.env.NEXT_PUBLIC_VENDURE_SHOP_API;
-const authTokenKey = process.env.AUTH_TOKEN_KEY as string;
+const authTokenKey = process.env.NEXT_PUBLIC_AUTH_TOKEN_KEY as string;
 
-function makeClient() {
-  const httpLink = new HttpLink({
-    uri: vendureApi,
-    credentials: 'include',
-  });
+let token: string;
 
-  const afterwareLink = new ApolloLink((operation, forward) => {
-    return forward(operation).map((response) => {
-      const context = operation.getContext();
-      const authHeader = context.response.headers.get('vendure-auth-token');
-      if (authHeader) {
-        // If the auth token has been returned by the Vendure
-        // server, we store it in localStorage
-        localStorage.setItem(authTokenKey, authHeader);
-      }
-      return response;
-    });
-  });
-
-  const isomorphicLinks = [
-    setContext(async () => {
-      const authToken = localStorage.getItem(authTokenKey);
-      if (authToken) {
-        // If we have stored the authToken from a previous
-        // response, we attach it to all subsequent requests.
-        return {
-          headers: {
-            authorization: `Bearer ${authToken}`,
-          },
-        };
-      }
-    }),
-    afterwareLink,
-    httpLink,
-  ];
-
-  return new ApolloClient({
-    cache: new NextSSRInMemoryCache(),
-    link:
-      typeof window === 'undefined'
-        ? ApolloLink.from([
-            new SSRMultipartLink({
-              stripDefer: true,
-            }),
-            ...isomorphicLinks,
-          ])
-        : ApolloLink.from(isomorphicLinks),
-  });
-}
-
-function makeSuspenseCache() {
-  return new SuspenseCache();
-}
-
-export function ApolloWrapper({ children }: React.PropsWithChildren) {
+export function ApolloWrapper({
+  children,
+  cookie,
+}: React.PropsWithChildren<{ cookie: string | null }>) {
   return (
     <ApolloNextAppProvider
       makeClient={makeClient}
@@ -79,4 +29,70 @@ export function ApolloWrapper({ children }: React.PropsWithChildren) {
       {children}
     </ApolloNextAppProvider>
   );
+
+  function makeClient() {
+    const httpLink = new HttpLink({
+      uri: vendureApi,
+      credentials: 'include',
+    });
+
+    const authLink = setContext(async () => {
+      if (typeof window === 'undefined') {
+        return {
+          headers: {
+            cookie,
+          },
+        };
+      }
+
+      const localAuthToken = localStorage.getItem(authTokenKey);
+
+      if (localAuthToken) {
+        // If we have stored the authToken from a previous
+        // response, we attach it to all subsequent requests.
+        return {
+          headers: {
+            authorization: `Bearer ${localAuthToken}`,
+          },
+        };
+      }
+    });
+
+    const afterwareLink = new ApolloLink((operation, forward) => {
+      return forward(operation).map((response) => {
+        const context = operation.getContext();
+        const authHeader = context.response.headers.get('vendure-auth-token');
+
+        if (authHeader) {
+          if (typeof window === 'undefined') {
+            token = authHeader;
+          } else {
+            // If the auth token has been returned by the Vendure
+            // server, we store it in localStorage
+            localStorage.setItem(authTokenKey, authHeader);
+          }
+        }
+        return response;
+      });
+    });
+
+    const isomorphicLinks = [authLink, afterwareLink, httpLink];
+
+    return new ApolloClient({
+      cache: new NextSSRInMemoryCache(),
+      link:
+        typeof window === 'undefined'
+          ? ApolloLink.from([
+              new SSRMultipartLink({
+                stripDefer: true,
+              }),
+              ...isomorphicLinks,
+            ])
+          : ApolloLink.from(isomorphicLinks),
+    });
+  }
+
+  function makeSuspenseCache() {
+    return new SuspenseCache();
+  }
 }

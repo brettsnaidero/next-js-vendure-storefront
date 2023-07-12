@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSuspenseQuery } from '@apollo/client';
+import { useSuspenseQuery } from '@apollo/experimental-nextjs-app-support/ssr';
 import { useForm } from 'react-hook-form';
 
 import { LockClosedIcon, PlusIcon } from '@heroicons/react/24/solid';
@@ -242,6 +242,7 @@ const CheckoutShipping = () => {
                 id="customer-information__email"
                 autoComplete="email"
                 {...registerCustomerForm('email', { required: true })}
+                stretched
               />
             </Field>
 

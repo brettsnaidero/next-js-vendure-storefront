@@ -2,7 +2,8 @@ import '@/styles/reset.css';
 import '@/styles/globals.css';
 import '@/styles/index.css';
 import { Inter } from 'next/font/google';
-import { ApolloWrapper } from '../lib/apollo-wrapper';
+import { headers } from 'next/headers';
+import { ApolloWrapper } from '@/lib/apollo-wrapper';
 import ThemeWrapper from '@/lib/theme-wrapper';
 import ActiveCustomerWrapper from '@/lib/active-customer-wrapper';
 
@@ -18,11 +19,18 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // Horrid solution based on
+  // https://community.apollographql.com/t/sending-user-credentials-when-used-in-next-13s-app-dir-react-server-components/6067/4
+  // and
+  // https://github.com/apollographql/apollo-client-nextjs/blob/4954601c71f130cd758b63ac7134e75844ca4534/examples/hack-the-supergraph-ssr/app/layout.tsx
+  const headerStore = headers();
+  const cookie = headerStore.get('cookie');
+
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <main className="wrapper">
-          <ApolloWrapper>
+          <ApolloWrapper cookie={cookie}>
             <ThemeWrapper>
               <ActiveCustomerWrapper>{children}</ActiveCustomerWrapper>
             </ThemeWrapper>

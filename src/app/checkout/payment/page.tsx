@@ -12,7 +12,7 @@ import BraintreeDropIn from '@/components/checkout/braintree/braintree-payments'
 import { useActiveOrder } from '@/utils/use-active-order';
 import { useBraintree } from '@/utils/checkout/use-braintree';
 import { useStripe } from '@/utils/checkout/use-stripe';
-import { useSuspenseQuery } from '@apollo/client';
+import { useSuspenseQuery } from '@apollo/experimental-nextjs-app-support/ssr';
 import { EligiblePaymentMethodsQuery } from '@/providers/checkout/checkout';
 import { useAddPaymentToOrderData } from '@/utils/checkout/use-add-payment-to-order';
 import LoadingPage from '@/components/loading';

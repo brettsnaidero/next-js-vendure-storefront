@@ -1,6 +1,6 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { paginationValidationSchema } from '@/utils/pagination';
-import { useSuspenseQuery } from '@apollo/client';
+import { useSuspenseQuery } from '@apollo/experimental-nextjs-app-support/ssr';
 import {
   SearchFacetValuesQuery,
   SearchQuery,

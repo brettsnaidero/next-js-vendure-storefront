@@ -18,8 +18,8 @@ const ShippingMethodSelector = ({
   onChange: (shippingMethodId: string) => void;
   currencyCode?: CurrencyCode;
 }) => {
-  const handleChange = (event: any) => {
-    onChange(event.target.value);
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onChange(event.currentTarget.value);
   };
 
   return (

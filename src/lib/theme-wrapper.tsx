@@ -1,9 +1,13 @@
 'use client';
 
 import React, { createContext } from 'react';
-import useTheme, { Theme } from '@/utils/use-theme';
+import { ThemeProvider } from 'next-themes';
+import { useTheme } from 'next-themes';
 
-export { Theme };
+export enum Theme {
+  Light = 'light',
+  Dark = 'dark',
+}
 
 export const ThemeContext = createContext<{
   theme?: Theme;
@@ -13,19 +17,30 @@ export const ThemeContext = createContext<{
   toggleTheme: () => {},
 });
 
-const ThemeWrapper = ({ children }: { children: React.ReactNode }) => {
-  const { theme, toggleTheme } = useTheme();
+const ThemeInnerWrapper = ({ children }: { children: React.ReactNode }) => {
+  const { theme, setTheme } = useTheme();
 
   return (
     <ThemeContext.Provider
       value={{
-        theme,
-        toggleTheme,
+        theme: theme as Theme | undefined,
+        toggleTheme: setTheme,
       }}
     >
       {children}
     </ThemeContext.Provider>
   );
 };
+
+const ThemeWrapper = ({ children }: { children: React.ReactNode }) => (
+  <ThemeProvider
+    attribute="class"
+    defaultTheme="system"
+    enableSystem={false}
+    themes={['light', 'dark']}
+  >
+    <ThemeInnerWrapper>{children}</ThemeInnerWrapper>
+  </ThemeProvider>
+);
 
 export default ThemeWrapper;

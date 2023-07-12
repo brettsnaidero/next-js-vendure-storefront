@@ -13,7 +13,7 @@ import Message from '@/components/message';
 import StockLevelLabel from '@/components/products/stock-level-label';
 import TopReviews from '@/components/products/top-reviews';
 import ScrollableContainer from '@/components/products/scrollable-container';
-import { useSuspenseQuery } from '@apollo/client';
+import { useSuspenseQuery } from '@apollo/experimental-nextjs-app-support/ssr';
 import Image from 'next/image';
 import { useActiveOrder } from '@/utils/use-active-order';
 import styles from '@/styles/pages/product.module.css';

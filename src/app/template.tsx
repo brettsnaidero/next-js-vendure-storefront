@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Header from '@/components/header/header';
 import Footer from '@/components/footer/footer';
 import CartTray from '@/components/cart/cart-tray';
-import { useSuspenseQuery } from '@apollo/client';
+import { useSuspenseQuery } from '@apollo/experimental-nextjs-app-support/ssr';
 import { CollectionsQuery } from '@/providers/collections/collections';
 import { CollectionsQuery as CollectionsQueryType } from '@/graphql-types.generated';
 import { useActiveOrder } from '@/utils/use-active-order';

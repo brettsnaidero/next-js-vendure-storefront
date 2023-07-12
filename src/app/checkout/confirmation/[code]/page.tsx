@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useSuspenseQuery } from '@apollo/client';
+import { useSuspenseQuery } from '@apollo/experimental-nextjs-app-support/ssr';
 import { OrderByCodeQuery } from '@/providers/orders/order';
 import CartContents from '@/components/cart/cart-contents';
 import CartTotals from '@/components/cart/cart-totals';
