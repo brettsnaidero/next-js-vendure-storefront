@@ -18,6 +18,28 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
+## Payments
+
+### Stripe integration
+
+This repo has a built-in Stripe payment integration. To enable it, ensure that your Vendure server is set up with the [StripePlugin](https://docs.vendure.io/typescript-api/core-plugins/payments-plugin/stripe-plugin/).
+
+Ensure your new PaymentMethod uses the word `stripe` somewhere in its code, as that's how this integration will know to load the Stripe payment element.
+
+Then add your Stripe publishable key to the env file:
+
+```
+STRIPE_PUBLISHABLE_KEY=pk_test_t38hl...etc
+```
+
+Important note: There's a race condition between Stripe redirecting a customer to the confirmation page and the webhook receiving the confirmation in the Vendure backend. As this condition is not very distinguishable from other potential issues, it is currently addressed by implementing a very simple retry system of 5 retries every 2.5s You can tweak these settings in the CheckoutConfirmation component.
+
+## Braintree integration
+
+This repo has built-in Braintree integration. To enable it, ensure that your Vendure server is set up with the [BraintreePlugin](https://docs.vendure.io/typescript-api/core-plugins/payments-plugin/braintree-plugin/).
+
+Currently, `storeCustomersInBraintree` has to be set to `true` in plugin options. Enabling this plugin with this setting on will require a database migration / synchronization.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

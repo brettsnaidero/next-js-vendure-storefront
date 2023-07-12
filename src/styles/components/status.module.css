@@ -1,0 +1,34 @@
+.level {
+  padding: var(--spacing-xs) var(--spacing-s);
+  border-radius: var(--border-radius-m);
+  border-width: 1px;
+  border-style: solid;
+  color: var(--colour-button-text);
+  display: flex;
+}
+
+.level.small {
+  font-size: var(--font-size-s);
+  line-height: var(--line-height-s);
+  padding: var(--spacing-s) var(--spacing-m);
+}
+
+.level.info {
+  background-color: var(--colour-info);
+  border-color: var(--colour-info-border);
+}
+
+.level.success {
+  background-color: var(--colour-success);
+  border-color: var(--colour-success-border);
+}
+
+.level.warning {
+  background-color: var(--colour-warning);
+  border-color: var(--colour-warning-border);
+}
+
+.level.error {
+  background-color: var(--colour-error);
+  border-color: var(--colour-error-border);
+}

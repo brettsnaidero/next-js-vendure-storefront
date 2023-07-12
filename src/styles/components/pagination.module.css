@@ -1,0 +1,43 @@
+.pagination {
+  display: flex;
+  align-items: center;
+  margin: var(--spacing-m) 0;
+}
+
+.per {
+  display: flex;
+  align-items: center;
+}
+
+@keyframes loading {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading {
+  margin-left: var(--spacing-s);
+}
+
+.loading svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+  animation: loading 1s linear infinite;
+}
+
+.nav {
+  display: flex;
+  margin-left: auto;
+}
+
+.nav li:not(:last-of-type) {
+  margin-right: var(--spacing-s);
+}
+
+.disabled {
+  padding: 0 var(--spacing-s);
+}

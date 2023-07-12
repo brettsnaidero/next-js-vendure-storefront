@@ -8,7 +8,7 @@ const SuccessPage = () => (
         <div>
           <div>
             <div>
-              <CheckCircleIcon aria-hidden="true" />
+              <CheckCircleIcon width={20} height={20} aria-hidden="true" />
             </div>
           </div>
           <p>

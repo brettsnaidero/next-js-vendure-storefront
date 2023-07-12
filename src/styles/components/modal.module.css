@@ -1,0 +1,15 @@
+.modal h2 {
+  font-size: var(--font-size-l);
+  line-height: var(--line-height-l);
+  margin-bottom: var(--spacing-m);
+}
+
+.modal p {
+  font-size: var(--font-size-s);
+  line-height: var(--line-height-s);
+  margin-bottom: var(--spacing-s);
+}
+
+.modal p strong {
+  font-weight: bold;
+}

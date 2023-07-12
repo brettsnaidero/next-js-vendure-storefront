@@ -12,7 +12,7 @@ const FormElement: React.FC<PropsWithChildren<FormElementProps>> = ({
   name,
   required = false,
 }) => {
-  const { error } = useField(name);
+  const error = undefined;
 
   return (
     <div>

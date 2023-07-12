@@ -1,55 +1,58 @@
 'use client';
 
 import { useState } from 'react';
-// import { useForm } from 'react-hook-form';
-// import { FacetFilterTracker } from '@/components/facet-filter/facet-filter-tracker';
-// import { FiltersButton } from '@/components/filters-button';
-
+import FiltersButton from '@/components/filters-button';
 import FilterableProductGrid from '@/components/products/filterable-product-grid';
-import { useSuspenseQuery } from '@apollo/client';
-import { SearchQuery } from '@/providers/products/products';
-import { SearchQuery as SearchQueryType } from '@/graphql-types.generated';
-import { useSearchParams } from 'next/navigation';
+import useFilteredProductSearch, {
+  TERM,
+} from '@/utils/use-filtered-product-search';
+import styles from '@/styles/pages/collections.module.css';
 
-const paginationLimitMinimumDefault = 25;
+const paginationLimitMinimumDefault = 24;
 const allowedPaginationLimits = new Set<number>([
   paginationLimitMinimumDefault,
-  50,
-  100,
+  48,
+  96,
 ]);
 
 const Search = () => {
-  const searchParams = useSearchParams();
-  const term = searchParams.get('term');
-  const { data } = useSuspenseQuery<SearchQueryType>(SearchQuery, {
-    variables: {
-      input: {
-        term,
-      },
-    },
+  const {
+    result,
+    resultWithoutFacetValueFilters,
+    facetValueIds,
+    appliedPaginationLimit,
+    appliedPaginationPage,
+    term,
+  } = useFilteredProductSearch({
+    pagePath: '/search',
+    allowedPaginationLimits,
+    paginationLimitMinimumDefault,
   });
 
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
-  const submit = () => {};
-
   return (
-    <div>
+    <div className={styles.heading}>
       <div>
-        <h2>{data?.search ? `Results for "${term}"` : 'All results'}</h2>
+        <h2>{result?.search ? `Results for "${term}"` : 'All results'}</h2>
 
-        {/* <FiltersButton onClick={() => setMobileFiltersOpen(true)} /> */}
+        <FiltersButton
+          filterCount={facetValueIds.length}
+          onClick={() => setMobileFiltersOpen(true)}
+        />
       </div>
 
-      <form onSubmit={submit}>
-        <FilterableProductGrid
-          items={data?.search?.items}
-          totalItems={data?.search?.totalItems}
-          allowedPaginationLimits={allowedPaginationLimits}
-          mobileFiltersOpen={mobileFiltersOpen}
-          setMobileFiltersOpen={setMobileFiltersOpen}
-        />
-      </form>
+      <FilterableProductGrid
+        basePath={`/search?${TERM}=${term}`}
+        result={result}
+        resultWithoutFacetValueFilters={resultWithoutFacetValueFilters}
+        facetValueIds={facetValueIds}
+        allowedPaginationLimits={allowedPaginationLimits}
+        appliedPaginationLimit={appliedPaginationLimit}
+        appliedPaginationPage={appliedPaginationPage}
+        mobileFiltersOpen={mobileFiltersOpen}
+        setMobileFiltersOpen={setMobileFiltersOpen}
+      />
     </div>
   );
 };

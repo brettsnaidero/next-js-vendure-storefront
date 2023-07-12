@@ -1,40 +1,63 @@
 import React, { createContext } from 'react';
-import { useActiveOrder } from '@/utils/use-active-order';
-import { ActiveOrderQuery as ActiveOrderQueryType } from '@/graphql-types.generated';
+import {
+  CustomerInformation,
+  ShippingData,
+  useActiveOrder,
+} from '@/utils/use-active-order';
+import {
+  ActiveOrderQuery as ActiveOrderQueryType,
+  ErrorResult,
+} from '@/graphql-types.generated';
 
 interface ActiveOrderType {
-  activeOrderFetcher: any;
   activeOrder?: ActiveOrderQueryType['activeOrder'];
-  adjustOrderLine: any;
-  removeItem: any;
-  refresh: any;
+  addItem?: (productVariantId: string) => void;
+  removeItem?: (lineId: string) => void;
+  adjustItem?: (lineId: string, quantity: number) => void;
+  setOrderCustomer?: (customerInformation: CustomerInformation) => void;
+  setShippingMethod?: (changeShippingMethod: string) => void;
+  setCheckoutShipping?: (shippingFormData: ShippingData) => void;
+  refresh: () => void;
+  error?: ErrorResult;
 }
 
 export const ActiveOrderContext = createContext<ActiveOrderType>({
-  activeOrderFetcher: null,
   activeOrder: undefined,
-  adjustOrderLine: null,
-  removeItem: null,
-  refresh: null,
+  addItem: undefined,
+  removeItem: undefined,
+  adjustItem: undefined,
+  setOrderCustomer: undefined,
+  setShippingMethod: undefined,
+  setCheckoutShipping: undefined,
+  refresh: () => {},
+  error: undefined,
 });
 
 const ActiveOrderWrapper = ({ children }: { children: JSX.Element }) => {
   const {
-    activeOrderFetcher,
     activeOrder,
-    adjustOrderLine,
+    addItem,
     removeItem,
+    adjustItem,
+    setOrderCustomer,
+    setShippingMethod,
+    setCheckoutShipping,
     refresh,
+    error,
   } = useActiveOrder();
 
   return (
     <ActiveOrderContext.Provider
       value={{
-        activeOrderFetcher,
         activeOrder,
-        adjustOrderLine,
+        addItem,
         removeItem,
+        adjustItem,
+        setOrderCustomer,
+        setShippingMethod,
+        setCheckoutShipping,
         refresh,
+        error,
       }}
     >
       {children}

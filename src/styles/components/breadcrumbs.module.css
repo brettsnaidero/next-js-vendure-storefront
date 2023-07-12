@@ -1,0 +1,36 @@
+.breadcrumbs {
+  display: flex;
+  flex-wrap: wrap;
+
+  font-size: var(--font-size-s);
+  padding: var(--spacing-m) 0;
+  color: var(--colour-text-secondary);
+  border-top: 1px solid var(--colour-outline);
+}
+
+.breadcrumbs li {
+  height: 20px;
+  line-height: 20px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.breadcrumbs li a {
+  display: flex;
+  align-items: center;
+}
+
+.icon {
+  margin-right: var(--spacing-xs);
+}
+
+.icon svg {
+  display: block;
+  height: 14px;
+  width: 14px;
+}
+
+.break {
+  padding: 0 var(--spacing-xs);
+}

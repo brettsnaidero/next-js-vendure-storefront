@@ -1,49 +1,85 @@
 import FacetFilterControls from '@/components/facet-filter/facet-filter-controls';
 import ProductCard from '@/components/products/product-card';
-import { Pagination } from '@/components/pagination';
+import Pagination from '@/components/pagination';
 import NoResultsHint from '@/components/products/no-results-hint';
+import { useRef } from 'react';
+import FacetFilterTracker from '../facet-filter/facet-filter-tracker';
+import { SearchFacetValuesQuery, SearchQuery } from '@/graphql-types.generated';
+import {
+  translatePaginationFrom,
+  translatePaginationTo,
+} from '@/utils/pagination';
+import styles from '@/styles/components/product-grid.module.css';
 
 const FilterableProductGrid = ({
-  items,
-  totalItems,
+  basePath,
+  result,
+  resultWithoutFacetValueFilters,
+  facetValueIds,
   allowedPaginationLimits,
+  appliedPaginationLimit,
+  appliedPaginationPage,
   mobileFiltersOpen,
   setMobileFiltersOpen,
 }: {
-  items: unknown;
-  totalItems: unknown;
+  basePath: string;
+  result: SearchQuery;
+  resultWithoutFacetValueFilters?: SearchFacetValuesQuery;
+  facetValueIds: string[];
   allowedPaginationLimits: Set<number>;
+  appliedPaginationLimit: number;
+  appliedPaginationPage: number;
   mobileFiltersOpen: boolean;
-  setMobileFiltersOpen: (arg0: boolean) => void;
+  setMobileFiltersOpen: (active: boolean) => void;
 }) => {
+  const facetValuesTracker = useRef(new FacetFilterTracker());
+  facetValuesTracker.current.update(
+    facetValueIds,
+    result?.search,
+    resultWithoutFacetValueFilters?.search,
+  );
+
   return (
-    <div>
+    <div className="layout-search">
       <FacetFilterControls
+        facetFilterTracker={facetValuesTracker?.current}
         mobileFiltersOpen={mobileFiltersOpen}
         setMobileFiltersOpen={setMobileFiltersOpen}
       />
-      {items.length > 0 ? (
-        <div>
-          <div>
-            {items.map((item) => (
+
+      {result.search.items.length > 0 ? (
+        <div className="layout-search-results">
+          <div className={styles.grid}>
+            {result.search.items.map((item) => (
               <ProductCard key={item.productId} {...item} />
             ))}
           </div>
 
           <div>
             <span>
-              Showing products {1} to {2}
+              Showing products{' '}
+              {translatePaginationFrom(
+                appliedPaginationPage,
+                appliedPaginationLimit,
+              )}{' '}
+              to{' '}
+              {translatePaginationTo(
+                appliedPaginationPage,
+                appliedPaginationLimit,
+                result.search.items.length,
+              )}
             </span>
             <Pagination
+              basePath={basePath}
+              totalItems={result.search.totalItems}
               appliedPaginationLimit={appliedPaginationLimit}
               allowedPaginationLimits={allowedPaginationLimits}
-              totalItems={totalItems}
               appliedPaginationPage={appliedPaginationPage}
             />
           </div>
         </div>
       ) : (
-        <NoResultsHint facetFilterTracker={facetValuesTracker.current} />
+        <NoResultsHint />
       )}
     </div>
   );

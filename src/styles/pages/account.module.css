@@ -1,0 +1,96 @@
+.account {
+}
+
+@media screen and (min-width: 720px) {
+  .account {
+    display: grid;
+    grid-template-columns: minmax(150px, 25%) 1fr;
+    grid-gap: var(--spacing-l);
+  }
+}
+
+.account h2 {
+  font-size: var(--font-size-l);
+  line-height: var(--line-height-l);
+  margin-bottom: var(--spacing-m);
+}
+
+.heading {
+  padding: var(--spacing-l) 0;
+}
+
+@media screen and (min-width: 720px) {
+  .heading {
+    border-right: 1px solid var(--colour-outline);
+  }
+}
+
+.page {
+  padding: var(--spacing-l) 0;
+}
+
+.heading p {
+  margin-bottom: var(--spacing-m);
+}
+
+/* Account details */
+.details {
+  margin-bottom: var(--spacing-m);
+}
+
+.details h3 {
+  color: var(--colour-text-secondary);
+  font-size: var(--font-size-s);
+  line-height: var(--line-height-s);
+  margin-bottom: var(--spacing-s);
+}
+
+.details p {
+  margin-bottom: var(--spacing-s);
+}
+
+/* Purchase history */
+.nothing {
+}
+
+/* Addresses */
+.card {
+  margin: var(--spacing-m) 0;
+  border-radius: var(--border-radius-m);
+  padding: var(--spacing-m);
+  border: 1px solid var(--colour-outline);
+}
+
+.data {
+  display: flex;
+}
+
+.default {
+  margin-left: auto;
+  text-align: right;
+  padding-left: var(--spacing-s);
+}
+
+.default h4 {
+  color: var(--colour-text-secondary);
+  font-size: var(--font-size-s);
+  line-height: var(--line-height-s);
+  margin-bottom: var(--spacing-xs);
+}
+
+.crud {
+  margin-top: var(--spacing-m);
+}
+
+/* Password */
+
+/* Pagination */
+.pagination {
+  font-size: var(--font-size-s);
+  line-height: var(--line-height-s);
+  color: var(--colour-text-secondary);
+}
+
+.pagination strong {
+  color: var(--colour-text);
+}

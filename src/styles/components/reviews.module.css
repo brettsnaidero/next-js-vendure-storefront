@@ -1,0 +1,50 @@
+.reviews {
+  padding: var(--spacing-l) 0;
+}
+
+.review {
+}
+
+@media (min-width: 720px) {
+  .review {
+    /*
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: var(--spacing-l);
+    */
+  }
+}
+
+.review:not(:first-of-type) {
+  margin-top: var(--spacing-l);
+}
+
+.review h3 {
+  font-size: var(--font-size-l);
+  line-height: var(--line-height-l);
+  margin-bottom: var(--spacing-xs);
+}
+
+.rating {
+  display: flex;
+  margin-bottom: var(--spacing-xs);
+}
+
+.stars {
+  margin-right: var(--spacing-s);
+  color: #f4df9d;
+}
+
+.actual p {
+  margin-bottom: var(--spacing-xs);
+}
+
+.citation {
+  font-size: var(--font-size-s);
+  line-height: var(--line-height-s);
+}
+
+.author {
+  margin-bottom: var(--spacing-xs);
+  margin-right: var(--spacing-xs);
+}

@@ -1,6 +1,5 @@
-/* This example requires Tailwind CSS v2.0+ */
 import { StarIcon } from '@heroicons/react/24/solid';
-import { classNames } from '@/utils/class-names';
+import styles from '@/styles/components/reviews.module.css';
 
 interface Review {
   id: number;
@@ -50,55 +49,49 @@ const reviews: Review[] = [
   },
 ];
 
-export default function TopReviews() {
-  return (
-    <div>
-      <div>
-        <h2>Recent reviews</h2>
+const TopReviews = () => (
+  <div className={styles.reviews}>
+    <h2>Recent reviews</h2>
+
+    {reviews.map((review) => (
+      <div key={review.id} className={styles.review}>
         <div>
-          {reviews.map((review) => (
-            <div key={review.id}>
-              <div>
-                <div>
-                  <div>
-                    {[0, 1, 2, 3, 4].map((rating) => (
-                      <StarIcon
-                        key={rating}
-                        className={classNames(
-                          review.rating > rating
-                            ? 'text-yellow-400'
-                            : 'text-gray-200',
-                          'h-5 w-5 flex-shrink-0',
-                        )}
-                        aria-hidden="true"
-                      />
-                    ))}
-                  </div>
-                  <p>
-                    {review.rating}
-                    <span> out of 5 stars</span>
-                  </p>
-                </div>
-
-                <div>
-                  <h3>{review.title}</h3>
-
-                  <div
-                    dangerouslySetInnerHTML={{
-                      __html: review.content,
-                    }}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <p>{review.author}</p>
-                <time dateTime={review.datetime}>{review.date}</time>
-              </div>
+          <div className={styles.rating}>
+            <div className={styles.stars}>
+              {[0, 1, 2, 3, 4].map((rating) => (
+                <StarIcon
+                  key={rating}
+                  className={review.rating > rating ? 'rating' : ''}
+                  aria-hidden="true"
+                  width={20}
+                  height={20}
+                />
+              ))}
             </div>
-          ))}
+            <p>
+              {review.rating}
+              <span> out of 5 stars</span>
+            </p>
+          </div>
+
+          <div className={styles.actual}>
+            <h3>{review.title}</h3>
+
+            <div
+              dangerouslySetInnerHTML={{
+                __html: review.content,
+              }}
+            />
+          </div>
+        </div>
+
+        <div className={styles.citation}>
+          <p className={styles.author}>{review.author}</p>
+          <time dateTime={review.datetime}>{review.date}</time>
         </div>
       </div>
-    </div>
-  );
-}
+    ))}
+  </div>
+);
+
+export default TopReviews;

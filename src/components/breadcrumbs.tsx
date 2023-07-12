@@ -1,5 +1,8 @@
 import { HomeIcon } from '@heroicons/react/24/solid';
 import Link from 'next/link';
+import styles from '@/styles/components/breadcrumbs.module.css';
+
+const ROOT_COLLECTION_NAME = '__root_collection__';
 
 const Breadcrumbs = ({
   items,
@@ -8,30 +11,23 @@ const Breadcrumbs = ({
 }) => {
   return (
     <nav>
-      <ol role="list">
-        <li>
-          <div>
-            <Link href="/">
-              <HomeIcon />
-              <span>Home</span>
-            </Link>
-          </div>
+      <ol role="list" className={styles.breadcrumbs}>
+        <li className={styles.hasIcon}>
+          <Link href="/">
+            <span className={styles.icon}>
+              <HomeIcon width={20} height={20} />
+            </span>
+            <span>Home</span>
+          </Link>
         </li>
         {items
-          .filter((item) => item.name !== '__root_collection__')
-          .map((item, index) => (
+          .filter((item) => item.name !== ROOT_COLLECTION_NAME)
+          .map((item) => (
             <li key={item.name}>
-              <div>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  aria-hidden="true"
-                >
-                  <path d="M5.555 17.776l8-16 .894.448-8 16-.894-.448z" />
-                </svg>
-                <Link href={`/collections/${item.slug}`}>{item.name}</Link>
+              <div className={styles.break}>
+                <span>/</span>
               </div>
+              <Link href={`/collections/${item.slug}`}>{item.name}</Link>
             </li>
           ))}
       </ol>

@@ -13,13 +13,12 @@ import {
 } from '@apollo/experimental-nextjs-app-support/ssr';
 import { setContext } from '@apollo/client/link/context';
 
-const vendureApi = process.env.NEXT_PUBLIC_VENDURE_SHOP_API as string;
+const vendureApi = process.env.NEXT_PUBLIC_VENDURE_SHOP_API;
 const authTokenKey = process.env.AUTH_TOKEN_KEY as string;
 
 function makeClient() {
   const httpLink = new HttpLink({
     uri: vendureApi,
-    headers: {},
     credentials: 'include',
   });
 
@@ -36,6 +35,23 @@ function makeClient() {
     });
   });
 
+  const isomorphicLinks = [
+    setContext(async () => {
+      const authToken = localStorage.getItem(authTokenKey);
+      if (authToken) {
+        // If we have stored the authToken from a previous
+        // response, we attach it to all subsequent requests.
+        return {
+          headers: {
+            authorization: `Bearer ${authToken}`,
+          },
+        };
+      }
+    }),
+    afterwareLink,
+    httpLink,
+  ];
+
   return new ApolloClient({
     cache: new NextSSRInMemoryCache(),
     link:
@@ -44,22 +60,9 @@ function makeClient() {
             new SSRMultipartLink({
               stripDefer: true,
             }),
-            setContext(async () => {
-              const authToken = localStorage.getItem(authTokenKey);
-              if (authToken) {
-                // If we have stored the authToken from a previous
-                // response, we attach it to all subsequent requests.
-                return {
-                  headers: {
-                    authorization: `Bearer ${authToken}`,
-                  },
-                };
-              }
-            }),
-            afterwareLink,
-            httpLink,
+            ...isomorphicLinks,
           ])
-        : httpLink,
+        : ApolloLink.from(isomorphicLinks),
   });
 }
 

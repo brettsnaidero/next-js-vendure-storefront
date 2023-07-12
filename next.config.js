@@ -7,6 +7,7 @@ const nextConfig = {
         hostname: 'cdn.shopify.com',
       },
     ],
+    domains: ['localhost'],
   },
 };
 

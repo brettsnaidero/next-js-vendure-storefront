@@ -1,0 +1,13 @@
+.card {
+}
+
+.card img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--border-radius-s);
+}
+
+.name {
+  margin-top: var(--spacing-s);
+}

@@ -1,0 +1,42 @@
+.search {
+  display: flex;
+  position: relative;
+  margin-right: var(--spacing-m);
+}
+
+.input {
+  display: block;
+  background: var(--colour-input-background);
+  border: 1px solid var(--colour-input-border);
+  color: var(--colour-text);
+  padding: 0 calc(20px + var(--spacing-m)) 0 var(--spacing-m);
+  height: 42px;
+  line-height: 40px;
+  border-radius: 21px;
+  width: 100%;
+}
+
+.input:focus {
+  outline: none;
+}
+
+.button {
+  display: block;
+  background: transparent;
+  color: var(--colour-text);
+  padding: 10px;
+  border: 1px solid var(--colour-input-border);
+  height: 42px;
+  line-height: 40px;
+  border-radius: 0 21px 21px 0;
+  position: absolute;
+  top: 0;
+  right: 0;
+  cursor: pointer;
+}
+
+.button svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+}

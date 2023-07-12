@@ -65,9 +65,9 @@ const ScrollableContainer = ({ children }: { children: ReactNode[] }) => {
     <span
       ref={spanRef}
       onMouseDown={mouseDownHandler}
-      onClickCapture={(e) => {
-        if (e.clientX != pos.x || e.clientY != pos.y) {
-          e.stopPropagation();
+      onClickCapture={(event) => {
+        if (event.clientX != pos.x || event.clientY != pos.y) {
+          event.stopPropagation();
         }
       }}
     >

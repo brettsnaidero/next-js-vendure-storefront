@@ -137,3 +137,34 @@ export const UpdateCustomerPasswordMutation = gql`
     }
   }
 `;
+
+export const ForgotPasswordMutation = gql`
+  mutation requestPasswordReset($emailAddress: String!) {
+    requestPasswordReset(emailAddress: $emailAddress) {
+      __typename
+      ... on Success {
+        success
+      }
+      ... on ErrorResult {
+        errorCode
+        message
+      }
+    }
+  }
+`;
+
+export const ResetPasswordMutation = gql`
+  mutation resetPassword($token: String!, $password: String!) {
+    resetPassword(token: $token, password: $password) {
+      __typename
+      ... on CurrentUser {
+        id
+        identifier
+      }
+      ... on ErrorResult {
+        errorCode
+        message
+      }
+    }
+  }
+`;

@@ -1,0 +1,68 @@
+.message {
+  padding: var(--spacing-s);
+  border-radius: var(--border-radius-m);
+  border-width: 1px;
+  border-style: solid;
+  color: var(--colour-button-text);
+  display: flex;
+}
+
+.message.large {
+  padding: var(--spacing-m);
+}
+
+.message.success {
+  background-color: var(--colour-success);
+  border-color: var(--colour-success-border);
+}
+
+.message.info {
+  background-color: var(--colour-info);
+  border-color: var(--colour-info-border);
+}
+
+.message.warning {
+  background-color: var(--colour-warning);
+  border-color: var(--colour-warning-border);
+}
+
+.message.error {
+  background-color: var(--colour-error);
+  border-color: var(--colour-error-border);
+}
+
+.text {
+  flex-grow: 1;
+}
+
+.heading {
+  font-size: var(--font-size-l);
+  line-height: var(--line-height-l);
+  margin-bottom: var(--spacing-s);
+}
+
+.close {
+  display: block;
+  margin-left: auto;
+}
+
+.button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--colour-text);
+}
+
+.button svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+
+.icon {
+  display: block;
+  width: 20px;
+  height: 20px;
+  margin-right: var(--spacing-s);
+  color: var(--colour-button-text);
+}

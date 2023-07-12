@@ -1,71 +1,72 @@
 'use client';
 
-import { useEffect } from 'react';
-import { Button } from '@/components/button';
+import { useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
+import Button, { ButtonTray } from '@/components/button';
 import Modal from '@/components/modal/modal';
-import { HighlightedButton } from '@/components/highlighted-button';
 import useToggleState from '@/utils/use-toggle-state';
-import CustomerAddressForm from '@/components/account/customer-address-form';
-import { CreateCustomerAddressMutation } from '@/providers/account/account';
+import CustomerAddressForm, {
+  CustomerAddressFormFields,
+} from '@/components/account/customer-address-form';
 import { AvailableCountriesQuery } from '@/providers/checkout/checkout';
-import { useMutation, useSuspenseQuery } from '@apollo/client';
+import { useSuspenseQuery } from '@apollo/client';
 import {
   AvailableCountriesQuery as AvailableCountriesQueryType,
-  CreateCustomerAddressMutation as CreateCustomerAddressMutationType,
+  useCreateCustomerAddressMutation,
 } from '@/graphql-types.generated';
-import { useRouter } from 'next/router';
 
+// TODO: Should this be a page? It seems to be a component
 const NewAddress = () => {
   const router = useRouter();
   const { data } = useSuspenseQuery<AvailableCountriesQueryType>(
     AvailableCountriesQuery,
   );
-  const [createCustomerAddress, { data: actionData, loading }] =
-    useMutation<CreateCustomerAddressMutationType>(
-      CreateCustomerAddressMutation,
-    );
+
+  const [
+    createCustomerAddress,
+    { data: createCustomerAddressData, loading, error },
+  ] = useCreateCustomerAddressMutation();
 
   const { state, close } = useToggleState(true);
 
-  useEffect(() => {
-    // TODO: Check success
-    if (actionData?.createCustomerAddress) {
-      close();
-    }
-  }, [actionData]);
-
-  const submitForm = () => {
-    // submit(formRef.current);
-  };
-
-  const afterClose = () => {
+  const closeModal = () => {
+    close();
     router.back();
   };
 
+  useEffect(() => {
+    if (!error && createCustomerAddressData) {
+      close();
+      router.push('/account/addresses');
+    }
+  }, [createCustomerAddressData, error]);
+
+  const submitForm = (data: CustomerAddressFormFields) => {
+    createCustomerAddress({
+      variables: {
+        input: {
+          city: data.city,
+          company: data.company,
+          countryCode: data.countryCode,
+          fullName: data.fullName,
+          phoneNumber: data.phone,
+          postalCode: data.postalCode,
+          province: data.province,
+          streetLine1: data.streetLine1,
+          streetLine2: data.streetLine2,
+        },
+      },
+    });
+  };
+
   return (
-    <div>
-      <Modal isOpen={state} close={close} afterClose={afterClose}>
-        <Modal.Title>New address</Modal.Title>
-        <Modal.Body>
-          <CustomerAddressForm
-            availableCountries={data?.availableCountries}
-            submit={submitForm}
-          />
-        </Modal.Body>
-        <Modal.Footer>
-          <Button type="button" onClick={close}>
-            Cancel
-          </Button>
-          <HighlightedButton
-            isSubmitting={loading}
-            type="submit"
-            onClick={submitForm}
-          >
-            Save
-          </HighlightedButton>
-        </Modal.Footer>
-      </Modal>
-    </div>
+    <Modal isOpen={state} close={closeModal}>
+      <h2>New address</h2>
+      <CustomerAddressForm
+        availableCountries={data?.availableCountries}
+        submit={submitForm}
+      />
+    </Modal>
   );
 };
 

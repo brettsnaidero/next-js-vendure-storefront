@@ -1,0 +1,41 @@
+@import './integrations/braintree.css';
+
+/* Layouts */
+.layout-search {
+  border-top: 1px solid var(--colour-outline);
+}
+
+@media (min-width: 720px) {
+  /* var(--breakpoint-m) */
+  .layout-search {
+    display: grid;
+    grid-template-columns: minmax(150px, 25%) auto;
+    grid-gap: var(--spacing-l);
+  }
+}
+
+/* Screen reader only */
+.sr-only {
+  clip: rect(1px, 1px, 1px, 1px);
+  clip-path: inset(50%);
+  height: 1px;
+  width: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+}
+
+/* Wrapper */
+.wrapper {
+  position: relative;
+  margin: 0 auto;
+  max-width: var(--wrapper);
+  padding: 0 var(--spacing-l);
+}
+
+a {
+  cursor: pointer;
+  color: var(--text);
+  text-decoration: none;
+}

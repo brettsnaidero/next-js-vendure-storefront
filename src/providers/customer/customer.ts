@@ -4,16 +4,6 @@ export const ActiveCustomerQuery = gql`
   query activeCustomer {
     activeCustomer {
       id
-      firstName
-      lastName
-    }
-  }
-`;
-
-export const ActiveCustomerDetailsQuery = gql`
-  query activeCustomerDetails {
-    activeCustomer {
-      id
       title
       firstName
       lastName
@@ -23,30 +13,37 @@ export const ActiveCustomerDetailsQuery = gql`
   }
 `;
 
+export const ActiveCustomerAddressesFragment = gql`
+  fragment ActiveCustomerAddresses on Address {
+    id
+    company
+    fullName
+    streetLine1
+    streetLine2
+    city
+    province
+    postalCode
+    country {
+      id
+      code
+      name
+    }
+    phoneNumber
+    defaultShippingAddress
+    defaultBillingAddress
+  }
+`;
+
 export const ActiveCustomerAddressesQuery = gql`
   query activeCustomerAddresses {
     activeCustomer {
       id
       addresses {
-        id
-        company
-        fullName
-        streetLine1
-        streetLine2
-        city
-        province
-        postalCode
-        country {
-          id
-          code
-          name
-        }
-        phoneNumber
-        defaultShippingAddress
-        defaultBillingAddress
+        ...ActiveCustomerAddresses
       }
     }
   }
+  ${ActiveCustomerAddressesFragment}
 `;
 
 export const ActiveCustomerOrderListQuery = gql`

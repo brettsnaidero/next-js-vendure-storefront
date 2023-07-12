@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import {
   ArrowPathIcon,
   CreditCardIcon,
@@ -10,45 +9,68 @@ import {
   TruckIcon,
 } from '@heroicons/react/24/outline';
 import {
-  Address,
-  DeleteCustomerAddressMutation as DeleteCustomerAddressMutationType,
+  ActiveCustomerAddressesFragment,
+  useDeleteCustomerAddressMutation,
+  useUpdateCustomerAddressMutation,
 } from '@/graphql-types.generated';
-import { Button } from '../button';
-import { ErrorMessage } from '../error-message';
-import { HighlightedButton } from '../highlighted-button';
-import Modal from '../modal/modal';
-import { useMutation } from '@apollo/client';
-import { DeleteCustomerAddressMutation } from '@/providers/account/account';
+import Button, { LinkButton, ButtonTray } from '@/components/button';
+import Modal from '@/components/modal/modal';
+import Message from '@/components/message';
+import styles from '@/styles/pages/account.module.css';
 
 type EditAddressProps = {
-  address: Address;
-  isActive?: boolean;
+  address: ActiveCustomerAddressesFragment;
+  refetch: () => void;
 };
 
-const EditAddressCard = ({ address, isActive = false }: EditAddressProps) => {
+const EditAddressCard = ({ address, refetch }: EditAddressProps) => {
   const [
     deleteAddress,
-    {
-      data: deleteAddressData,
-      loading: deletingAddress,
-      error: deletingAddressError,
-    },
-  ] = useMutation<DeleteCustomerAddressMutationType>(
-    DeleteCustomerAddressMutation,
-  );
-  const [updateShipping, { loading: settingShipping }] = useMutation<unknown>();
-  const [updateBilling, { loading: settingBilling }] = useMutation<unknown>();
+    { loading: deletingAddress, error: deletingAddressError },
+  ] = useDeleteCustomerAddressMutation();
+  const [updateCustomerAddress, { loading }] =
+    useUpdateCustomerAddressMutation();
 
   const [isDeleteModalVisible, setDeleteModalVisible] =
     useState<boolean>(false);
 
-  // <input type="hidden" name="id" value={address.id} />
+  const removeAddress = (event: React.SyntheticEvent) => {
+    event.preventDefault();
 
-  const removeAddress = () => {
-    deleteAddress();
+    deleteAddress({
+      variables: { id: address.id },
+    });
   };
-  const setShipping = () => {};
-  const setBilling = () => {};
+
+  const setShipping = (event: React.SyntheticEvent) => {
+    event.preventDefault();
+
+    updateCustomerAddress({
+      variables: {
+        input: {
+          id: address.id,
+          defaultShippingAddress: true,
+        },
+      },
+    });
+
+    refetch();
+  };
+
+  const setBilling = (event: React.SyntheticEvent) => {
+    event.preventDefault();
+
+    updateCustomerAddress({
+      variables: {
+        input: {
+          id: address.id,
+          defaultBillingAddress: true,
+        },
+      },
+    });
+
+    refetch();
+  };
 
   return (
     <>
@@ -58,67 +80,63 @@ const EditAddressCard = ({ address, isActive = false }: EditAddressProps) => {
         close={() => setDeleteModalVisible(deletingAddress ? false : true)}
       >
         <form onSubmit={removeAddress}>
-          <Modal.Title>Remove Address</Modal.Title>
-          <Modal.Body>
-            <div>
-              Do you want to remove this address?
-              {deletingAddressError && (
-                <ErrorMessage
-                  heading="Address could not be removed"
-                  message={
-                    deletingAddressError?.message ?? 'Something went wrong.'
-                  }
-                />
-              )}
-            </div>
-          </Modal.Body>
-          <Modal.Footer>
+          <h2>Remove Address</h2>
+
+          <div>
+            Do you want to remove this address?
+            {deletingAddressError && (
+              <Message
+                type="error"
+                headingText="Address could not be removed"
+                text={deletingAddressError?.message ?? 'Something went wrong.'}
+              />
+            )}
+          </div>
+          <ButtonTray>
             <Button
               type="button"
               onClick={() => setDeleteModalVisible(false)}
               disabled={deletingAddress}
+              role="secondary"
             >
               Cancel
             </Button>
-            <HighlightedButton
-              type="submit"
-              name="_action"
-              value="deleteAddress"
-              disabled={deletingAddress}
-              isSubmitting={deletingAddress}
-            >
+            <Button type="submit" disabled={deletingAddress}>
               Yes
-            </HighlightedButton>
-          </Modal.Footer>
+            </Button>
+          </ButtonTray>
         </form>
       </Modal>
-      <div className={isActive ? 'active' : ''}>
-        <div>
+
+      <div className={styles.card}>
+        <div className={styles.data}>
           {/* Customer Data Section */}
           <div>
-            <span>{address.fullName}</span>
-            {address.company && <span>{address.company}</span>}
             <div>
-              <span>
+              <span>{address.fullName}</span>
+              {address.company && <span> {address.company}</span>}
+            </div>
+            <div>
+              <div>
                 {address.streetLine1}
                 {address.streetLine2 && <span>, {address.streetLine2}</span>}
-              </span>
-              <span>
+              </div>
+              <div>
                 {address.postalCode}, {address.city}
-              </span>
-              <span>
+              </div>
+              <div>
                 {address.province && `${address.province}, `}
                 {address.country?.code?.toUpperCase()}
-              </span>
+              </div>
             </div>
           </div>
           {/* Default Shipping/Billing Section */}
           {(address.defaultShippingAddress ||
             address.defaultBillingAddress) && (
-            <div>
-              <span>Default</span>
-              <span>
-                {address.defaultShippingAddress && 'Shipping'}
+            <div className={styles.default}>
+              <h4>Default</h4>
+              <p>
+                {address.defaultShippingAddress && ' Shipping'}
                 {address.defaultShippingAddress &&
                   address.defaultBillingAddress && (
                     <>
@@ -127,80 +145,79 @@ const EditAddressCard = ({ address, isActive = false }: EditAddressProps) => {
                     </>
                   )}
                 {address.defaultBillingAddress && 'Billing'}
-              </span>
+              </p>
             </div>
           )}
         </div>
+
         {/* CRUD Actions */}
-        <div>
-          <div>
-            <Link
-              role="button"
+        <div className={styles.crud}>
+          <ButtonTray>
+            <LinkButton
               // preventScrollReset
               href={`/account/addresses/${address.id}`}
+              icon={<PencilIcon width={20} height={20} />}
+              size="small"
             >
-              <PencilIcon></PencilIcon>
               Edit
-            </Link>
-            <button
+            </LinkButton>
+            <Button
               type="button"
-              title="Delete this address"
+              role="negative"
+              // title="Delete this address"
               disabled={deletingAddress}
               onClick={() => setDeleteModalVisible(true)}
+              icon={
+                deletingAddress ? (
+                  <ArrowPathIcon width={20} height={20} />
+                ) : (
+                  <TrashIcon width={20} height={20} />
+                )
+              }
+              size="small"
             >
-              {!deletingAddress ? (
-                <TrashIcon></TrashIcon>
-              ) : (
-                <ArrowPathIcon></ArrowPathIcon>
-              )}
               Remove
-            </button>
-          </div>
-          {(!address.defaultShippingAddress ||
-            !address.defaultBillingAddress) && (
-            <div>
-              <span>
-                {/* Default shipping */}
-                {!address.defaultShippingAddress && (
-                  <form onSubmit={setShipping}>
-                    <button
-                      name="_action"
-                      value="setDefaultShipping"
-                      type="submit"
-                      title="Set as default shipping address"
-                      disabled={settingShipping}
-                    >
-                      {!settingShipping ? (
-                        <TruckIcon></TruckIcon>
-                      ) : (
-                        <ArrowPathIcon></ArrowPathIcon>
-                      )}
-                      Shipping
-                    </button>
-                  </form>
-                )}
+            </Button>
 
-                {!address.defaultBillingAddress && (
-                  <form onSubmit={setBilling}>
-                    <button
-                      name="_action"
-                      value="setDefaultBilling"
-                      type="submit"
-                      title="Set as default billing address"
-                      disabled={settingBilling}
-                    >
-                      {!settingBilling ? (
-                        <CreditCardIcon></CreditCardIcon>
-                      ) : (
-                        <ArrowPathIcon></ArrowPathIcon>
-                      )}
-                      Billing
-                    </button>
-                  </form>
-                )}
-              </span>
-            </div>
-          )}
+            {/* Default shipping and billing */}
+            {!address.defaultShippingAddress && (
+              <Button
+                type="button"
+                onClick={setShipping}
+                disabled={loading}
+                icon={
+                  loading ? (
+                    <ArrowPathIcon width={20} height={20} />
+                  ) : (
+                    <TruckIcon width={20} height={20} />
+                  )
+                }
+                size="small"
+                role="secondary"
+              >
+                Set as default shipping address
+              </Button>
+            )}
+            {!address.defaultBillingAddress && (
+              <Button
+                type="button"
+                onClick={setBilling}
+                // title="Set as default billing address"
+                disabled={loading}
+                icon={
+                  loading ? (
+                    <ArrowPathIcon width={20} height={20} />
+                  ) : (
+                    <CreditCardIcon width={20} height={20} />
+                  )
+                }
+                size="small"
+                role="secondary"
+              >
+                Set as default billing address
+              </Button>
+            )}
+          </ButtonTray>
         </div>
       </div>
     </>

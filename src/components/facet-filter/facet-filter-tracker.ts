@@ -1,6 +1,6 @@
 import { SearchFacetValuesQuery, SearchQuery } from '@/graphql-types.generated';
 
-export interface FacetWithValues {
+interface FacetWithValues {
   id: string;
   name: string;
   values: Array<{
@@ -10,7 +10,8 @@ export interface FacetWithValues {
   }>;
 }
 
-export class FacetFilterTracker {
+// What does this do?
+class FacetFilterTracker {
   private _facetsWithValues: FacetWithValues[] = [];
 
   get facetsWithValues() {
@@ -18,35 +19,39 @@ export class FacetFilterTracker {
   }
 
   update(
-    searchResult: SearchQuery['search'],
-    resultWithoutFacetValueFilters: SearchFacetValuesQuery['search'],
     activeFacetValueIds: string[],
+    searchResult: SearchQuery['search'],
+    resultWithoutFacetValueFilters?: SearchFacetValuesQuery['search'],
   ) {
     this._facetsWithValues = this.groupFacetValues(
-      resultWithoutFacetValueFilters,
-      searchResult.facetValues,
       activeFacetValueIds,
+      searchResult?.facetValues,
+      resultWithoutFacetValueFilters,
     );
   }
 
   private groupFacetValues(
-    withoutFilters: SearchFacetValuesQuery['search'],
-    current: SearchQuery['search']['facetValues'] | null,
     activeFacetValueIds: string[],
+    current?: SearchQuery['search']['facetValues'],
+    withoutFilters?: SearchFacetValuesQuery['search'],
   ): FacetWithValues[] {
     if (!current) {
       return [];
     }
+
     const facetMap = new Map<string, FacetWithValues>();
+
     for (const {
       facetValue: { id, name, facet },
       count,
-    } of withoutFilters.facetValues) {
-      if (count === withoutFilters.totalItems) {
+    } of withoutFilters?.facetValues || []) {
+      if (count === withoutFilters?.totalItems) {
         continue;
       }
+
       const facetFromMap = facetMap.get(facet.id);
       const selected = activeFacetValueIds.includes(id);
+
       if (facetFromMap) {
         facetFromMap.values.push({ id, name, selected });
       } else {
@@ -60,3 +65,5 @@ export class FacetFilterTracker {
     return Array.from(facetMap.values());
   }
 }
+
+export default FacetFilterTracker;

@@ -1,0 +1,31 @@
+.page {
+  padding: var(--spacing-l) 0;
+}
+
+.heading {
+  margin-bottom: var(--spacing-l);
+}
+
+.heading h2 {
+  font-size: var(--font-size-l);
+  line-height: var(--line-height-l);
+}
+
+.heading p {
+  margin-top: var(--spacing-m);
+}
+
+.layout {
+}
+
+@media (min-width: 720px) {
+  .layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: var(--spacing-l);
+  }
+}
+
+.block {
+  margin-top: var(--spacing-m);
+}

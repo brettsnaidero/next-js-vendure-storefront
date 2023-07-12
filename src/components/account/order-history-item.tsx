@@ -2,44 +2,40 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Button } from '@/components/button';
-import Price from '@/components/products/price';
-import { ActiveCustomerOrderListQuery } from '@/graphql-types.generated';
-import { OrderStateBadge } from '@/components/account/order-state-badge';
-import { ChevronRightIcon } from '@heroicons/react/24/solid';
-import { EllipsisVerticalIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
+import clsx from 'clsx';
+import { MinusCircleIcon, PlusCircleIcon } from '@heroicons/react/24/solid';
+import { LinkButton } from '@/components/button';
+import Price from '@/components/products/price';
+import OrderStateBadge from '@/components/account/order-state-badge';
+import Toggle from '@/components/expander';
+import { ActiveCustomerOrderListQuery } from '@/graphql-types.generated';
+import styles from '@/styles/components/order-history.module.css';
 
 type OrderHistoryItemProps = {
   order?: NonNullable<
     ActiveCustomerOrderListQuery['activeCustomer']
   >['orders']['items'][number];
-  isInitiallyExpanded?: boolean;
   areDetailsInitiallyExpanded?: boolean;
   className?: string;
 };
 
-export default function OrderHistoryItem({
+const OrderHistoryItem = ({
   order,
-  isInitiallyExpanded = false,
   areDetailsInitiallyExpanded = false,
   className,
-}: OrderHistoryItemProps) {
-  const [isExpanded, setIsExpanded] = useState<boolean>(isInitiallyExpanded);
-  const [areDetailsExpanded, setAreDetailsExpanded] = useState<boolean>(
-    areDetailsInitiallyExpanded,
-  );
+}: OrderHistoryItemProps) => {
   const [isLineCalcExpanded, setIsLineCalcExpanded] = useState<boolean>(false);
 
   return (
-    <div className={className}>
+    <div className={clsx([className, styles.order])}>
       {/* Upper Summary */}
-      <div>
+      <div className={styles.upper}>
         {/* Infos */}
-        <div>
+        <ul className={styles.glance}>
           {/* Info - Date */}
-          <div>
-            <span>Date placed</span>
+          <li>
+            <h4>Date placed</h4>
             <span title={new Date(order?.orderPlacedAt).toLocaleString()}>
               {order?.orderPlacedAt
                 ? new Date(order.orderPlacedAt).toLocaleDateString(undefined, {
@@ -49,231 +45,247 @@ export default function OrderHistoryItem({
                   })
                 : '--'}
             </span>
-          </div>
+          </li>
           {/* Info - Total sum */}
-          <div>
-            <span>Total sum</span>
+          <li>
+            <h4>Total sum</h4>
             <span>
               <Price
                 currencyCode={order?.currencyCode}
                 priceWithTax={order?.totalWithTax}
               />
             </span>
-          </div>
+          </li>
           {/* Info - Order number */}
-          <div>
-            <span>Order number</span>
+          <li>
+            <h4>Order number</h4>
             <span>{order?.code || '--'}</span>
-          </div>
-        </div>
+          </li>
+        </ul>
 
-        {/* Status + Actions */}
-        <div>
+        {/* Status */}
+        <div className={styles.status}>
           <OrderStateBadge state={order?.state} />
-          <div>
-            <Button title="Actions for this order (Not implemented)">
-              <span>Actions</span>
-              <EllipsisVerticalIcon />
-            </Button>
-            <Button
-              onClick={() => setIsExpanded(!isExpanded)}
-              title="Expand this order"
-            >
-              <ChevronRightIcon
-                className={`w-5 h-5 transition-transform duration-100 ${
-                  isExpanded && 'rotate-90'
-                }`}
-              />
-            </Button>
-          </div>
         </div>
       </div>
 
-      {/* Collapsable details */}
-      {isExpanded && (
-        <div>
+      <div>
+        <ul className={styles.lines}>
           {order?.lines.map((line, key) => (
-            <div key={key}>
+            <li key={key} className={styles.product}>
               {/* Product */}
+              <Link href={`/products/${line.productVariant.product.slug}`}>
+                {line.featuredAsset?.source ? (
+                  <Image
+                    alt={line.productVariant.name}
+                    src={line.featuredAsset?.source}
+                    width={600}
+                    height={400}
+                  />
+                ) : (
+                  <div>No image</div>
+                )}
+              </Link>
+
               <div>
-                <Link href={`/products/${line.productVariant.product.slug}`}>
-                  <Image src={line.featuredAsset?.source} />
-                </Link>
-                <span>
-                  {/* Product name */}
+                {/* Product name */}
+                <h4>
                   <Link
                     href={`/products/${line.productVariant.product.slug}`}
                     title={line.productVariant.name}
                   >
                     {line.productVariant.name}
                   </Link>
-                  {/* Price and quantity */}
-                  <button
-                    onClick={() => setIsLineCalcExpanded(!isLineCalcExpanded)}
-                  >
+                </h4>
+
+                {/* Price and quantity */}
+
+                <div className={styles.price}>
+                  <div>
                     {isLineCalcExpanded && (
                       <>
-                        <span title="Quantity">{line.quantity}</span>
-                        <span>×</span>
+                        <span title="Quantity">{line.quantity}</span>{' '}
+                        <span className={styles.minor}>×</span>{' '}
                         <span title="Price per unit">
                           <Price
                             currencyCode={line.productVariant.currencyCode}
                             priceWithTax={line.discountedUnitPriceWithTax}
                           />
-                        </span>
-                        <span>Ξ</span>
+                        </span>{' '}
+                        <span className={styles.minor}>Ξ</span>{' '}
                       </>
                     )}
-                    <span title="Subtotal">
+                    <span>
                       <Price
                         currencyCode={line.productVariant.currencyCode}
                         priceWithTax={line.discountedLinePriceWithTax}
                       />
                     </span>
+                  </div>
+
+                  <button
+                    className={styles.expand}
+                    type="button"
+                    onClick={() => setIsLineCalcExpanded(!isLineCalcExpanded)}
+                  >
+                    {isLineCalcExpanded ? (
+                      <MinusCircleIcon width={20} height={20} />
+                    ) : (
+                      <PlusCircleIcon width={20} height={20} />
+                    )}
                   </button>
-                  {/* Shipment status */}
-                  <span>
-                    {line.fulfillmentLines?.reduce(
-                      (acc, fLine) => acc + fLine.quantity,
-                      0,
-                    ) === 0
-                      ? 'Not shipped yet'
-                      : `${line.fulfillmentLines?.reduce(
-                          (acc, fLine) => acc + fLine.quantity,
-                          0,
-                        )} of ${line.quantity} items fulfilled`}
-                    {line.fulfillmentLines
-                      ?.filter((fLine) => fLine.quantity > 0)
-                      .map((fLine, key) => (
-                        <span
-                          key={key}
-                          title={new Date(
-                            fLine.fulfillment.updatedAt,
-                          ).toLocaleString()}
-                        >
-                          {fLine.fulfillment.state}:{' '}
-                          {new Intl.DateTimeFormat(undefined, {
-                            dateStyle: 'medium',
-                          }).format(new Date(fLine.fulfillment.updatedAt))}
-                        </span>
-                      ))}
-                  </span>
-                </span>
+                </div>
+
+                {/* Shipment status */}
+                <div>
+                  {line.fulfillmentLines?.reduce(
+                    (acc, fLine) => acc + fLine.quantity,
+                    0,
+                  ) === 0
+                    ? 'Not shipped yet'
+                    : `${line.fulfillmentLines?.reduce(
+                        (acc, fLine) => acc + fLine.quantity,
+                        0,
+                      )} of ${line.quantity} items fulfilled`}
+
+                  {line.fulfillmentLines
+                    ?.filter((fLine) => fLine.quantity > 0)
+                    .map((fLine, key) => (
+                      <span
+                        key={key}
+                        title={new Date(
+                          fLine.fulfillment.updatedAt,
+                        ).toLocaleString()}
+                      >
+                        {fLine.fulfillment.state}:{' '}
+                        {new Intl.DateTimeFormat(undefined, {
+                          dateStyle: 'medium',
+                        }).format(new Date(fLine.fulfillment.updatedAt))}
+                      </span>
+                    ))}
+                </div>
               </div>
-            </div>
+            </li>
+          ))}
+        </ul>
+
+        {/* Per order actions */}
+        <div className={styles.bottom}>
+          {order?.fulfillments?.map((fulfillment, index) => (
+            <LinkButton
+              href="https://auspost.com.au/mypost/track/#/search"
+              key={index}
+              onClick={() => {
+                // TODO
+                console.log(
+                  `Here you'd need to link your delivery service. Tracking code for this package is "${fulfillment.trackingCode}"`,
+                );
+              }}
+            >
+              {/* Only show package number if there are more than one*/}
+              Track package{' '}
+              {order.fulfillments?.length == 1 ? '' : `#${index + 1}`}
+            </LinkButton>
           ))}
 
-          {/* Per order actions */}
-          <div>
-            {order?.fulfillments?.map((f, i) => (
-              <Button
-                key={i}
-                onClickCapture={() =>
-                  alert(
-                    `Here you'd need to Link your delivery service. Tracking code for this package is "${f.trackingCode}"`,
-                  )
-                }
-              >
-                {/* Only show package number if there are more than one: Looks cleaner */}
-                Track package{' '}
-                {order.fulfillments?.length == 1 ? '' : `#${i + 1}`}
-              </Button>
-            ))}
-            <Button onClick={() => setAreDetailsExpanded(!areDetailsExpanded)}>
-              <span>Detailed overview</span>
-              <ChevronRightIcon
-                className={`w-5 h-5 transition-transform duration-100 ${
-                  areDetailsExpanded && 'rotate-90'
-                }`}
-              />
-            </Button>
-          </div>
-
-          {/* More details - Could be expanded with shipping adresses, payment option, etc. */}
-          {areDetailsExpanded && (
-            <div>
-              <h6>Order summary</h6>
-              <span>Item(s) Subtotal:</span>
-              <span>
+          <Toggle title="Order summary" initial={areDetailsInitiallyExpanded}>
+            {/* More details - Could be expanded with shipping adresses, payment option, etc. */}
+            <div className={styles.details}>
+              <div>
+                <h6>Item(s) Subtotal</h6>
                 <Price
                   currencyCode={order?.currencyCode}
                   priceWithTax={order?.subTotalWithTax}
                 />
-              </span>
+              </div>
 
-              <span>Shipping & handling:</span>
-              <span>
-                <Price
-                  currencyCode={order?.currencyCode}
-                  priceWithTax={order?.shippingLines.reduce(
-                    (acc, s) => acc + s.priceWithTax,
-                    0,
-                  )}
-                />
-              </span>
-
-              <span>Total before tax:</span>
-              <span>
-                <Price
-                  currencyCode={order?.currencyCode}
-                  priceWithTax={order?.taxSummary.reduce(
-                    (acc, t) => acc + t.taxBase,
-                    0,
-                  )}
-                />
-              </span>
-
-              <span>Estimated tax:</span>
-              <span>
-                <Price
-                  currencyCode={order?.currencyCode}
-                  priceWithTax={order?.taxSummary.reduce(
-                    (acc, t) => acc + t.taxTotal,
-                    0,
-                  )}
-                />
-              </span>
-
-              <span>Total:</span>
-              {order?.totalWithTax && order.discounts ? (
+              <div>
+                <h6>Shipping & handling</h6>
                 <span>
                   <Price
                     currencyCode={order?.currencyCode}
-                    priceWithTax={
-                      order.totalWithTax -
-                      order?.discounts.reduce(
-                        (acc, curr) => acc + curr.amountWithTax,
-                        0,
-                      )
-                    }
+                    priceWithTax={order?.shippingLines.reduce(
+                      (acc, s) => acc + s.priceWithTax,
+                      0,
+                    )}
                   />
                 </span>
-              ) : (
-                <span>--</span>
-              )}
+              </div>
 
-              <span>Applied coupons:</span>
-              <span>
-                <Price
-                  currencyCode={order?.currencyCode}
-                  priceWithTax={order?.discounts.reduce(
-                    (acc, curr) => acc + curr.amountWithTax,
-                    0,
-                  )}
-                />
-              </span>
+              <div>
+                <h6>Total before tax</h6>
+                <span>
+                  <Price
+                    currencyCode={order?.currencyCode}
+                    priceWithTax={order?.taxSummary.reduce(
+                      (acc, t) => acc + t.taxBase,
+                      0,
+                    )}
+                  />
+                </span>
+              </div>
 
-              <span>Grand total:</span>
-              <span>
-                <Price
-                  currencyCode={order?.currencyCode}
-                  priceWithTax={order?.totalWithTax}
-                />
-              </span>
+              <div>
+                <h6>Estimated tax</h6>
+                <span>
+                  <Price
+                    currencyCode={order?.currencyCode}
+                    priceWithTax={order?.taxSummary.reduce(
+                      (acc, t) => acc + t.taxTotal,
+                      0,
+                    )}
+                  />
+                </span>
+              </div>
+
+              <div>
+                <h6>Total</h6>
+                {order?.totalWithTax && order.discounts ? (
+                  <span>
+                    <Price
+                      currencyCode={order?.currencyCode}
+                      priceWithTax={
+                        order.totalWithTax -
+                        order?.discounts.reduce(
+                          (acc, curr) => acc + curr.amountWithTax,
+                          0,
+                        )
+                      }
+                    />
+                  </span>
+                ) : (
+                  <span>--</span>
+                )}
+              </div>
+
+              <div>
+                <h6>Applied coupons</h6>
+                <span>
+                  <Price
+                    currencyCode={order?.currencyCode}
+                    priceWithTax={order?.discounts.reduce(
+                      (acc, curr) => acc + curr.amountWithTax,
+                      0,
+                    )}
+                  />
+                </span>
+              </div>
+
+              <div>
+                <h6>Grand total</h6>
+                <span>
+                  <Price
+                    currencyCode={order?.currencyCode}
+                    priceWithTax={order?.totalWithTax}
+                  />
+                </span>
+              </div>
             </div>
-          )}
+          </Toggle>
         </div>
-      )}
+      </div>
     </div>
   );
-}
+};
+
+export default OrderHistoryItem;

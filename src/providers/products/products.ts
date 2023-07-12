@@ -54,6 +54,7 @@ export const ProductQuery = gql`
       ...DetailedProduct
     }
   }
+  ${DetailedProductFragment}
 `;
 
 export const ListedProductFragment = gql`
@@ -118,5 +119,4 @@ export const SearchFacetValuesQuery = gql`
       }
     }
   }
-  ${ListedProductFragment}
 `;

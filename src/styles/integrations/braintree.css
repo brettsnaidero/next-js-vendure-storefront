@@ -1,0 +1,6 @@
+/* Override/customise Braintree UI styles */
+.braintree-heading {
+  font-size: var(--font-size-m);
+  line-height: var(--line-height-m);
+  color: var(--colour-text-secondary);
+}

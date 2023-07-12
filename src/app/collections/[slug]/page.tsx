@@ -1,18 +1,17 @@
 'use client';
 
-import { useRef, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { CollectionCard } from '@/components/collections/collection-card';
+import { useState } from 'react';
+import { useSuspenseQuery } from '@apollo/client';
+import CollectionCard from '@/components/collections/collection-card';
 import Breadcrumbs from '@/components/breadcrumbs';
-import { FacetFilterTracker } from '@/components/facet-filter/facet-filter-tracker';
-import { FiltersButton } from '@/components/filters-button';
-// import { FilterableProductGrid } from '@/components/products/filterable-product-grid';
-import { APP_META_TITLE } from '@/constants';
-// import { filteredSearchLoaderFromPagination } from '@/utils/filtered-search-loader';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import FilterableProductGrid from '@/components/products/filterable-product-grid';
+import FiltersButton from '@/components/filters-button';
+import { CollectionQuery } from '@/providers/collections/collections';
+import { CollectionQuery as CollectionQueryType } from '@/graphql-types.generated';
+import useFilteredProductSearch from '@/utils/use-filtered-product-search';
+import styles from '@/styles/pages/collections.module.css';
 
-// TODO: The "filteredSearchLoaderFromPagination" will need to be rewritten
+// import { APP_META_TITLE } from '@/constants';
 
 // export const meta: MetaFunction = ({ data }) => {
 //   return {
@@ -22,138 +21,85 @@ import { z } from 'zod';
 //   };
 // };
 
-// const paginationLimitMinimumDefault = 25;
-// const allowedPaginationLimits = new Set<number>([
-//   paginationLimitMinimumDefault,
-//   50,
-//   100,
-// ]);
-// const { validator, filteredSearchLoader } = filteredSearchLoaderFromPagination(
-//   allowedPaginationLimits,
-//   paginationLimitMinimumDefault,
-// );
-
-// export async function loader({ params, request, context }: DataFunctionArgs) {
-//   const {
-//     result,
-//     resultWithoutFacetValueFilters,
-//     facetValueIds,
-//     appliedPaginationLimit,
-//     appliedPaginationPage,
-//     term,
-//   } = await filteredSearchLoader({
-//     params,
-//     request,
-//     context,
-//   });
-//   const collection = (await sdk.collection({ slug: params.slug })).collection;
-//   if (!collection?.id || !collection?.name) {
-//     throw new Response('Not Found', {
-//       status: 404,
-//     });
-//   }
-
-//   return {
-//     term,
-//     collection,
-//     result,
-//     resultWithoutFacetValueFilters,
-//     facetValueIds,
-//     appliedPaginationLimit,
-//     appliedPaginationPage,
-//   };
-// }
+const paginationLimitMinimumDefault = 24;
+const allowedPaginationLimits = new Set<number>([
+  paginationLimitMinimumDefault,
+  48,
+  96,
+]);
 
 const CollectionSlug = ({ params }: { params: { slug: string } }) => {
-  //   const {
-  //     result,
-  //     resultWithoutFacetValueFilters,
-  //     facetValueIds,
-  //     appliedPaginationLimit,
-  //     appliedPaginationPage,
-  //     term,
-  //   } = await filteredSearchLoader({
-  //     params,
-  //     request,
-  //     context,
-  //   });
+  const { data, error } = useSuspenseQuery<CollectionQueryType>(
+    CollectionQuery,
+    {
+      variables: {
+        slug: params.slug,
+      },
+    },
+  );
 
-  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
-  // const facetValuesTracker = useRef(new FacetFilterTracker());
-  // facetValuesTracker.current.update(
-  //   result,
-  //   resultWithoutFacetValueFilters,
-  //   facetValueIds,
-  // );
-
-  const { register, handleSubmit } = useForm({
-    resolver: zodResolver(z.object({})),
+  const {
+    result,
+    resultWithoutFacetValueFilters,
+    facetValueIds,
+    appliedPaginationLimit,
+    appliedPaginationPage,
+  } = useFilteredProductSearch({
+    slug: params.slug,
+    pagePath: `/collections/${params.slug}`,
+    allowedPaginationLimits,
+    paginationLimitMinimumDefault,
   });
 
-  const onSubmit = () => {};
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   // Not found
-  if (true) {
+  if (error || !data?.collection) {
     return (
       <div>
         <h2>Collection not found!</h2>
-        <div>
-          <div>
-            <div></div>
-            <div></div>
-            <div></div>
-          </div>
-          <div>
-            <div>
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
-            </div>
-          </div>
-        </div>
       </div>
     );
   }
 
-  // return (
-  //   <div>
-  //     <div>
-  //       <h2>{collection.name}</h2>
+  return (
+    <div>
+      <div className={styles.heading}>
+        <h2>{data?.collection?.name}</h2>
 
-  //       <FiltersButton
-  //         filterCount={facetValueIds.length}
-  //         onClick={() => setMobileFiltersOpen(true)}
-  //       />
-  //     </div>
+        <FiltersButton
+          filterCount={facetValueIds.length}
+          onClick={() => setMobileFiltersOpen(true)}
+        />
+      </div>
 
-  //     <Breadcrumbs items={collection.breadcrumbs}></Breadcrumbs>
-  //     {collection.children?.length ? (
-  //       <div>
-  //         <h2>Collections</h2>
-  //         <div>
-  //           {collection.children.map((child) => (
-  //             <CollectionCard
-  //               key={child.id}
-  //               collection={child}
-  //             ></CollectionCard>
-  //           ))}
-  //         </div>
-  //       </div>
-  //     ) : (
-  //       ''
-  //     )}
+      <Breadcrumbs items={data?.collection.breadcrumbs} />
 
-  //     <form onSubmit={handleSubmit(onSubmit)}>
-  //       <FilterableProductGrid
-  //         allowedPaginationLimits={allowedPaginationLimits}
-  //         mobileFiltersOpen={mobileFiltersOpen}
-  //         setMobileFiltersOpen={setMobileFiltersOpen}
-  //         {...loaderData}
-  //       />
-  //     </form>
-  //   </div>
-  // );
+      {/* Child collections (eg. Electronics > Computers) */}
+      {data?.collection.children?.length ? (
+        <div className={styles.subcategories}>
+          <h3>Collections</h3>
+          <div className={styles.collections}>
+            {data?.collection.children.map((child) => (
+              <CollectionCard key={child.id} collection={child} />
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      <FilterableProductGrid
+        basePath={`/collections/${params.slug}`}
+        result={result}
+        resultWithoutFacetValueFilters={resultWithoutFacetValueFilters}
+        facetValueIds={facetValueIds}
+        allowedPaginationLimits={allowedPaginationLimits}
+        appliedPaginationLimit={appliedPaginationLimit}
+        appliedPaginationPage={appliedPaginationPage}
+        mobileFiltersOpen={mobileFiltersOpen}
+        setMobileFiltersOpen={setMobileFiltersOpen}
+      />
+    </div>
+  );
 };
 
 export default CollectionSlug;

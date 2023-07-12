@@ -1,17 +1,25 @@
-import { FunnelIcon } from '@heroicons/react/24/solid';
+import { FunnelIcon } from '@heroicons/react/24/outline';
+import Button from '@/components/button';
+import styles from '@/styles/components/filters.module.css';
 
-export function FiltersButton({
+const FiltersButton = ({
   filterCount,
   onClick,
 }: {
   filterCount: number;
   onClick: () => void;
-}) {
-  return (
-    <button type="button" onClick={onClick}>
-      {!!filterCount ? <span>{filterCount}</span> : ''}
-      <span>Filters</span>
-      <FunnelIcon />
-    </button>
-  );
-}
+}) => (
+  <div className={styles.button}>
+    <Button
+      type="button"
+      onClick={onClick}
+      icon={<FunnelIcon width={20} height={20} />}
+      role="secondary"
+    >
+      Filters
+      {!!filterCount ? <span className={styles.count}>{filterCount}</span> : ''}
+    </Button>
+  </div>
+);
+
+export default FiltersButton;

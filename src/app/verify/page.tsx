@@ -3,22 +3,18 @@
 import { useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
-import { VerifyCustomerAccountMutation } from '@/providers/account/account';
-import { useMutation } from '@apollo/client';
-import { VerifyCustomerAccountMutation as VerifyCustomerAccountMutationType } from '@/graphql-types.generated';
+import { useVerifyCustomerAccountMutation } from '@/graphql-types.generated';
 
 const VerifyTokenPage = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
+
   const [verifyCustomerAccount, { data, error }] =
-    useMutation<VerifyCustomerAccountMutationType>(
-      VerifyCustomerAccountMutation,
-      {
-        variables: {
-          token: searchParams.get('token'),
-        },
+    useVerifyCustomerAccountMutation({
+      variables: {
+        token: searchParams.get('token') ?? '',
       },
-    );
+    });
 
   // Verify user on load of page
   useEffect(() => {
@@ -36,16 +32,20 @@ const VerifyTokenPage = () => {
     }
   }, [data, router, searchParams, error]);
 
+  if (!searchParams.get('token')) {
+    router.replace('/');
+
+    return <div>Loading...</div>;
+  }
+
   if (error) {
     return (
       <div>
         <div>
-          <div>
-            <XCircleIcon aria-hidden="true" />
-          </div>
-          <div>
-            <p>{error?.message}</p>
-          </div>
+          <XCircleIcon width={20} height={20} aria-hidden="true" />
+        </div>
+        <div>
+          <p>{error?.message}</p>
         </div>
       </div>
     );
@@ -54,21 +54,10 @@ const VerifyTokenPage = () => {
   return (
     <div>
       <div>
-        <div>
-          <div>
-            <div>
-              <div>
-                <CheckCircleIcon aria-hidden="true" />
-              </div>
-              <div>
-                <p>
-                  Your account has been verified successfully. Redirecting in
-                  5s...
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+        <CheckCircleIcon width={20} height={20} aria-hidden="true" />
+      </div>
+      <div>
+        <p>Your account has been verified successfully. Redirecting in 5s...</p>
       </div>
     </div>
   );

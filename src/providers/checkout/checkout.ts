@@ -1,4 +1,5 @@
 import gql from 'graphql-tag';
+import { OrderDetailFragment } from '../orders/order';
 
 export const EligibleShippingMethodsQuery = gql`
   query eligibleShippingMethods {
@@ -52,6 +53,7 @@ export const AddPaymentToOrderMutation = gql`
       }
     }
   }
+  ${OrderDetailFragment}
 `;
 
 export const TransitionOrderToStateMutation = gql`
@@ -64,6 +66,7 @@ export const TransitionOrderToStateMutation = gql`
       }
     }
   }
+  ${OrderDetailFragment}
 `;
 
 export const CreateStripePaymentIntentMutation = gql`

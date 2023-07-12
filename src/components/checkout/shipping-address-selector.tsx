@@ -1,18 +1,12 @@
-import { RadioGroup } from '@headlessui/react';
-import { classNames } from '@/utils/class-names';
-import { Price } from '@/components/products/price';
-import { CheckCircleIcon } from '@heroicons/react/24/solid';
-import {
-  ActiveCustomerAddressesQuery,
-  CurrencyCode,
-  EligibleShippingMethodsQuery,
-} from '@/graphql-types.generated';
+import React from 'react';
+import { ActiveCustomerAddressesQuery } from '@/graphql-types.generated';
+import Radio, { RadioGroup } from '../form/radio';
 
 export type SelectedAddress = NonNullable<
   NonNullable<ActiveCustomerAddressesQuery['activeCustomer']>['addresses']
 >[number];
 
-export function ShippingAddressSelector({
+const ShippingAddressSelector = ({
   addresses,
   selectedAddressIndex,
   onChange,
@@ -20,51 +14,39 @@ export function ShippingAddressSelector({
   addresses: SelectedAddress[];
   selectedAddressIndex: number;
   onChange: (value: number) => void;
-}) {
+}) => {
+  const handleChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
+    onChange(+event.target.value);
+  };
+
   return (
-    <RadioGroup value={selectedAddressIndex} onChange={onChange}>
-      <div>
-        {(addresses || []).map((address, index) => (
-          <RadioGroup.Option
+    <RadioGroup>
+      {(addresses || []).map((address, index) => {
+        const id = `shipping-address-${index}`;
+        return (
+          <Radio
             key={index}
             value={index}
-            className={({ checked, active }) =>
-              `${checked ?? 'oi'} ${active ?? 'po'}`
-            }
+            onChange={handleChange}
+            name="shipping-address-selection"
+            checked={selectedAddressIndex === index}
+            id={id}
           >
-            {({ checked, active }) => (
-              <>
-                <span>
-                  <span>
-                    <RadioGroup.Label as="span">
-                      {address.streetLine1}, {address.postalCode}
-                    </RadioGroup.Label>
-                    <RadioGroup.Description as="span">
-                      <ul>
-                        <li>{address.streetLine1}</li>
-                        <li>{address.streetLine2}</li>
-                        <li>{address.city}</li>
-                        <li>{address.province}</li>
-                        <li>{address.postalCode}</li>
-                        <li>{address.country.name}</li>
-                      </ul>
-                    </RadioGroup.Description>
-                  </span>
-                </span>
-                {checked ? <CheckCircleIcon aria-hidden="true" /> : null}
-                <span
-                  className={classNames(
-                    active ? 'border' : 'border-2',
-                    checked ? 'border-primary-500' : 'border-transparent',
-                    'absolute -inset-px rounded-lg pointer-events-none',
-                  )}
-                  aria-hidden="true"
-                />
-              </>
-            )}
-          </RadioGroup.Option>
-        ))}
-      </div>
+            <label htmlFor={id}>
+              <ul>
+                <li>{address.streetLine1}</li>
+                <li>{address.streetLine2}</li>
+                <li>
+                  {address.city}, {address.province} {address.postalCode}
+                </li>
+                <li>{address.country.name}</li>
+              </ul>
+            </label>
+          </Radio>
+        );
+      })}
     </RadioGroup>
   );
-}
+};
+
+export default ShippingAddressSelector;

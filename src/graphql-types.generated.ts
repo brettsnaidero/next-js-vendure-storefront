@@ -1606,7 +1606,7 @@ export type Mutation = {
   authenticate: AuthenticationResult;
   /** Create a new Customer Address */
   createCustomerAddress: Address;
-  createStripePaymentIntent?: Maybe<Scalars['String']>;
+  createStripePaymentIntent: Scalars['String'];
   /** Delete an existing Address */
   deleteCustomerAddress: Success;
   /** Authenticates the user using the native authentication strategy. This mutation is an alias for `authenticate({ native: { ... }})` */
@@ -2767,7 +2767,7 @@ export type Query = {
   facet?: Maybe<Facet>;
   /** A list of Facets available to the shop */
   facets: FacetList;
-  generateBraintreeClientToken?: Maybe<Scalars['String']>;
+  generateBraintreeClientToken: Scalars['String'];
   /** Returns information about the current authenticated User */
   me?: Maybe<CurrentUser>;
   /** Returns the possible next states that the activeOrder can transition to */
@@ -2811,6 +2811,12 @@ export type QueryFacetArgs = {
 
 export type QueryFacetsArgs = {
   options?: InputMaybe<FacetListOptions>;
+};
+
+
+export type QueryGenerateBraintreeClientTokenArgs = {
+  includeCustomerId?: InputMaybe<Scalars['Boolean']>;
+  orderId?: InputMaybe<Scalars['ID']>;
 };
 
 
@@ -3367,6 +3373,21 @@ export type UpdateCustomerPasswordMutationVariables = Exact<{
 
 export type UpdateCustomerPasswordMutation = { __typename?: 'Mutation', updateCustomerPassword: { __typename: 'InvalidCredentialsError', errorCode: ErrorCode, message: string } | { __typename: 'NativeAuthStrategyError', errorCode: ErrorCode, message: string } | { __typename: 'PasswordValidationError', errorCode: ErrorCode, message: string } | { __typename: 'Success', success: boolean } };
 
+export type RequestPasswordResetMutationVariables = Exact<{
+  emailAddress: Scalars['String'];
+}>;
+
+
+export type RequestPasswordResetMutation = { __typename?: 'Mutation', requestPasswordReset?: { __typename: 'NativeAuthStrategyError', errorCode: ErrorCode, message: string } | { __typename: 'Success', success: boolean } | null };
+
+export type ResetPasswordMutationVariables = Exact<{
+  token: Scalars['String'];
+  password: Scalars['String'];
+}>;
+
+
+export type ResetPasswordMutation = { __typename?: 'Mutation', resetPassword: { __typename: 'CurrentUser', id: string, identifier: string } | { __typename: 'NativeAuthStrategyError', errorCode: ErrorCode, message: string } | { __typename: 'NotVerifiedError', errorCode: ErrorCode, message: string } | { __typename: 'PasswordResetTokenExpiredError', errorCode: ErrorCode, message: string } | { __typename: 'PasswordResetTokenInvalidError', errorCode: ErrorCode, message: string } | { __typename: 'PasswordValidationError', errorCode: ErrorCode, message: string } };
+
 export type ActiveChannelQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -3409,12 +3430,12 @@ export type TransitionOrderToStateMutation = { __typename?: 'Mutation', transiti
 export type CreateStripePaymentIntentMutationVariables = Exact<{ [key: string]: never; }>;
 
 
-export type CreateStripePaymentIntentMutation = { __typename?: 'Mutation', createStripePaymentIntent?: string | null };
+export type CreateStripePaymentIntentMutation = { __typename?: 'Mutation', createStripePaymentIntent: string };
 
 export type GenerateBraintreeClientTokenQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GenerateBraintreeClientTokenQuery = { __typename?: 'Query', generateBraintreeClientToken?: string | null };
+export type GenerateBraintreeClientTokenQuery = { __typename?: 'Query', generateBraintreeClientToken: string };
 
 export type CollectionsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -3432,12 +3453,9 @@ export type CollectionQuery = { __typename?: 'Query', collection?: { __typename?
 export type ActiveCustomerQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type ActiveCustomerQuery = { __typename?: 'Query', activeCustomer?: { __typename?: 'Customer', id: string, firstName: string, lastName: string } | null };
+export type ActiveCustomerQuery = { __typename?: 'Query', activeCustomer?: { __typename?: 'Customer', id: string, title?: string | null, firstName: string, lastName: string, phoneNumber?: string | null, emailAddress: string } | null };
 
-export type ActiveCustomerDetailsQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type ActiveCustomerDetailsQuery = { __typename?: 'Query', activeCustomer?: { __typename?: 'Customer', id: string, title?: string | null, firstName: string, lastName: string, phoneNumber?: string | null, emailAddress: string } | null };
+export type ActiveCustomerAddressesFragment = { __typename?: 'Address', id: string, company?: string | null, fullName?: string | null, streetLine1: string, streetLine2?: string | null, city?: string | null, province?: string | null, postalCode?: string | null, phoneNumber?: string | null, defaultShippingAddress?: boolean | null, defaultBillingAddress?: boolean | null, country: { __typename?: 'Country', id: string, code: string, name: string } };
 
 export type ActiveCustomerAddressesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -3450,6 +3468,8 @@ export type ActiveCustomerOrderListQueryVariables = Exact<{
 
 
 export type ActiveCustomerOrderListQuery = { __typename?: 'Query', activeCustomer?: { __typename?: 'Customer', orders: { __typename?: 'OrderList', totalItems: number, items: Array<{ __typename?: 'Order', code: string, state: string, orderPlacedAt?: any | null, currencyCode: CurrencyCode, subTotal: any, subTotalWithTax: any, total: any, totalWithTax: any, shippingWithTax: any, shippingLines: Array<{ __typename?: 'ShippingLine', priceWithTax: any }>, taxSummary: Array<{ __typename?: 'OrderTaxSummary', taxBase: any, taxTotal: any }>, discounts: Array<{ __typename?: 'Discount', amountWithTax: any }>, fulfillments?: Array<{ __typename?: 'Fulfillment', trackingCode?: string | null }> | null, lines: Array<{ __typename?: 'OrderLine', quantity: number, discountedLinePriceWithTax: any, discountedUnitPriceWithTax: any, fulfillmentLines?: Array<{ __typename?: 'FulfillmentLine', quantity: number, fulfillment: { __typename?: 'Fulfillment', state: string, updatedAt: any } }> | null, featuredAsset?: { __typename?: 'Asset', name: string, source: string, preview: string } | null, productVariant: { __typename?: 'ProductVariant', name: string, sku: string, currencyCode: CurrencyCode, priceWithTax: any, product: { __typename?: 'Product', slug: string } } }> }> } } | null };
+
+export type OrderDetailFragment = { __typename: 'Order', id: string, code: string, active: boolean, createdAt: any, state: string, currencyCode: CurrencyCode, totalQuantity: number, subTotal: any, subTotalWithTax: any, shippingWithTax: any, totalWithTax: any, taxSummary: Array<{ __typename?: 'OrderTaxSummary', description: string, taxRate: number, taxTotal: any }>, customer?: { __typename?: 'Customer', id: string, firstName: string, lastName: string, emailAddress: string } | null, shippingAddress?: { __typename?: 'OrderAddress', fullName?: string | null, streetLine1?: string | null, streetLine2?: string | null, company?: string | null, city?: string | null, province?: string | null, postalCode?: string | null, countryCode?: string | null, phoneNumber?: string | null } | null, shippingLines: Array<{ __typename?: 'ShippingLine', priceWithTax: any, shippingMethod: { __typename?: 'ShippingMethod', id: string, name: string } }>, lines: Array<{ __typename?: 'OrderLine', id: string, unitPriceWithTax: any, linePriceWithTax: any, quantity: number, featuredAsset?: { __typename?: 'Asset', id: string, preview: string } | null, productVariant: { __typename?: 'ProductVariant', id: string, name: string, price: any, product: { __typename?: 'Product', id: string, slug: string } } }>, payments?: Array<{ __typename?: 'Payment', id: string, state: string, method: string, amount: any, metadata?: any | null }> | null };
 
 export type SetCustomerForOrderMutationVariables = Exact<{
   input: CreateCustomerInput;
@@ -3495,8 +3515,6 @@ export type AdjustOrderLineMutationVariables = Exact<{
 
 export type AdjustOrderLineMutation = { __typename?: 'Mutation', adjustOrderLine: { __typename?: 'InsufficientStockError', errorCode: ErrorCode, message: string } | { __typename?: 'NegativeQuantityError', errorCode: ErrorCode, message: string } | { __typename: 'Order', id: string, code: string, active: boolean, createdAt: any, state: string, currencyCode: CurrencyCode, totalQuantity: number, subTotal: any, subTotalWithTax: any, shippingWithTax: any, totalWithTax: any, taxSummary: Array<{ __typename?: 'OrderTaxSummary', description: string, taxRate: number, taxTotal: any }>, customer?: { __typename?: 'Customer', id: string, firstName: string, lastName: string, emailAddress: string } | null, shippingAddress?: { __typename?: 'OrderAddress', fullName?: string | null, streetLine1?: string | null, streetLine2?: string | null, company?: string | null, city?: string | null, province?: string | null, postalCode?: string | null, countryCode?: string | null, phoneNumber?: string | null } | null, shippingLines: Array<{ __typename?: 'ShippingLine', priceWithTax: any, shippingMethod: { __typename?: 'ShippingMethod', id: string, name: string } }>, lines: Array<{ __typename?: 'OrderLine', id: string, unitPriceWithTax: any, linePriceWithTax: any, quantity: number, featuredAsset?: { __typename?: 'Asset', id: string, preview: string } | null, productVariant: { __typename?: 'ProductVariant', id: string, name: string, price: any, product: { __typename?: 'Product', id: string, slug: string } } }>, payments?: Array<{ __typename?: 'Payment', id: string, state: string, method: string, amount: any, metadata?: any | null }> | null } | { __typename?: 'OrderLimitError', errorCode: ErrorCode, message: string } | { __typename?: 'OrderModificationError', errorCode: ErrorCode, message: string } };
 
-export type OrderDetailFragment = { __typename: 'Order', id: string, code: string, active: boolean, createdAt: any, state: string, currencyCode: CurrencyCode, totalQuantity: number, subTotal: any, subTotalWithTax: any, shippingWithTax: any, totalWithTax: any, taxSummary: Array<{ __typename?: 'OrderTaxSummary', description: string, taxRate: number, taxTotal: any }>, customer?: { __typename?: 'Customer', id: string, firstName: string, lastName: string, emailAddress: string } | null, shippingAddress?: { __typename?: 'OrderAddress', fullName?: string | null, streetLine1?: string | null, streetLine2?: string | null, company?: string | null, city?: string | null, province?: string | null, postalCode?: string | null, countryCode?: string | null, phoneNumber?: string | null } | null, shippingLines: Array<{ __typename?: 'ShippingLine', priceWithTax: any, shippingMethod: { __typename?: 'ShippingMethod', id: string, name: string } }>, lines: Array<{ __typename?: 'OrderLine', id: string, unitPriceWithTax: any, linePriceWithTax: any, quantity: number, featuredAsset?: { __typename?: 'Asset', id: string, preview: string } | null, productVariant: { __typename?: 'ProductVariant', id: string, name: string, price: any, product: { __typename?: 'Product', id: string, slug: string } } }>, payments?: Array<{ __typename?: 'Payment', id: string, state: string, method: string, amount: any, metadata?: any | null }> | null };
-
 export type ActiveOrderQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -3535,6 +3553,26 @@ export type SearchFacetValuesQueryVariables = Exact<{
 
 export type SearchFacetValuesQuery = { __typename?: 'Query', search: { __typename?: 'SearchResponse', totalItems: number, facetValues: Array<{ __typename?: 'FacetValueResult', count: number, facetValue: { __typename?: 'FacetValue', id: string, name: string, facet: { __typename?: 'Facet', id: string, name: string } } }> } };
 
+export const ActiveCustomerAddressesFragmentDoc = gql`
+    fragment ActiveCustomerAddresses on Address {
+  id
+  company
+  fullName
+  streetLine1
+  streetLine2
+  city
+  province
+  postalCode
+  country {
+    id
+    code
+    name
+  }
+  phoneNumber
+  defaultShippingAddress
+  defaultBillingAddress
+}
+    `;
 export const OrderDetailFragmentDoc = gql`
     fragment OrderDetail on Order {
   __typename
@@ -4085,6 +4123,88 @@ export function useUpdateCustomerPasswordMutation(baseOptions?: Apollo.MutationH
 export type UpdateCustomerPasswordMutationHookResult = ReturnType<typeof useUpdateCustomerPasswordMutation>;
 export type UpdateCustomerPasswordMutationResult = Apollo.MutationResult<UpdateCustomerPasswordMutation>;
 export type UpdateCustomerPasswordMutationOptions = Apollo.BaseMutationOptions<UpdateCustomerPasswordMutation, UpdateCustomerPasswordMutationVariables>;
+export const RequestPasswordResetDocument = gql`
+    mutation requestPasswordReset($emailAddress: String!) {
+  requestPasswordReset(emailAddress: $emailAddress) {
+    __typename
+    ... on Success {
+      success
+    }
+    ... on ErrorResult {
+      errorCode
+      message
+    }
+  }
+}
+    `;
+export type RequestPasswordResetMutationFn = Apollo.MutationFunction<RequestPasswordResetMutation, RequestPasswordResetMutationVariables>;
+
+/**
+ * __useRequestPasswordResetMutation__
+ *
+ * To run a mutation, you first call `useRequestPasswordResetMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRequestPasswordResetMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [requestPasswordResetMutation, { data, loading, error }] = useRequestPasswordResetMutation({
+ *   variables: {
+ *      emailAddress: // value for 'emailAddress'
+ *   },
+ * });
+ */
+export function useRequestPasswordResetMutation(baseOptions?: Apollo.MutationHookOptions<RequestPasswordResetMutation, RequestPasswordResetMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RequestPasswordResetMutation, RequestPasswordResetMutationVariables>(RequestPasswordResetDocument, options);
+      }
+export type RequestPasswordResetMutationHookResult = ReturnType<typeof useRequestPasswordResetMutation>;
+export type RequestPasswordResetMutationResult = Apollo.MutationResult<RequestPasswordResetMutation>;
+export type RequestPasswordResetMutationOptions = Apollo.BaseMutationOptions<RequestPasswordResetMutation, RequestPasswordResetMutationVariables>;
+export const ResetPasswordDocument = gql`
+    mutation resetPassword($token: String!, $password: String!) {
+  resetPassword(token: $token, password: $password) {
+    __typename
+    ... on CurrentUser {
+      id
+      identifier
+    }
+    ... on ErrorResult {
+      errorCode
+      message
+    }
+  }
+}
+    `;
+export type ResetPasswordMutationFn = Apollo.MutationFunction<ResetPasswordMutation, ResetPasswordMutationVariables>;
+
+/**
+ * __useResetPasswordMutation__
+ *
+ * To run a mutation, you first call `useResetPasswordMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useResetPasswordMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [resetPasswordMutation, { data, loading, error }] = useResetPasswordMutation({
+ *   variables: {
+ *      token: // value for 'token'
+ *      password: // value for 'password'
+ *   },
+ * });
+ */
+export function useResetPasswordMutation(baseOptions?: Apollo.MutationHookOptions<ResetPasswordMutation, ResetPasswordMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ResetPasswordMutation, ResetPasswordMutationVariables>(ResetPasswordDocument, options);
+      }
+export type ResetPasswordMutationHookResult = ReturnType<typeof useResetPasswordMutation>;
+export type ResetPasswordMutationResult = Apollo.MutationResult<ResetPasswordMutation>;
+export type ResetPasswordMutationOptions = Apollo.BaseMutationOptions<ResetPasswordMutation, ResetPasswordMutationVariables>;
 export const ActiveChannelDocument = gql`
     query activeChannel {
   activeChannel {
@@ -4503,8 +4623,11 @@ export const ActiveCustomerDocument = gql`
     query activeCustomer {
   activeCustomer {
     id
+    title
     firstName
     lastName
+    phoneNumber
+    emailAddress
   }
 }
     `;
@@ -4535,70 +4658,16 @@ export function useActiveCustomerLazyQuery(baseOptions?: Apollo.LazyQueryHookOpt
 export type ActiveCustomerQueryHookResult = ReturnType<typeof useActiveCustomerQuery>;
 export type ActiveCustomerLazyQueryHookResult = ReturnType<typeof useActiveCustomerLazyQuery>;
 export type ActiveCustomerQueryResult = Apollo.QueryResult<ActiveCustomerQuery, ActiveCustomerQueryVariables>;
-export const ActiveCustomerDetailsDocument = gql`
-    query activeCustomerDetails {
-  activeCustomer {
-    id
-    title
-    firstName
-    lastName
-    phoneNumber
-    emailAddress
-  }
-}
-    `;
-
-/**
- * __useActiveCustomerDetailsQuery__
- *
- * To run a query within a React component, call `useActiveCustomerDetailsQuery` and pass it any options that fit your needs.
- * When your component renders, `useActiveCustomerDetailsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useActiveCustomerDetailsQuery({
- *   variables: {
- *   },
- * });
- */
-export function useActiveCustomerDetailsQuery(baseOptions?: Apollo.QueryHookOptions<ActiveCustomerDetailsQuery, ActiveCustomerDetailsQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<ActiveCustomerDetailsQuery, ActiveCustomerDetailsQueryVariables>(ActiveCustomerDetailsDocument, options);
-      }
-export function useActiveCustomerDetailsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ActiveCustomerDetailsQuery, ActiveCustomerDetailsQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<ActiveCustomerDetailsQuery, ActiveCustomerDetailsQueryVariables>(ActiveCustomerDetailsDocument, options);
-        }
-export type ActiveCustomerDetailsQueryHookResult = ReturnType<typeof useActiveCustomerDetailsQuery>;
-export type ActiveCustomerDetailsLazyQueryHookResult = ReturnType<typeof useActiveCustomerDetailsLazyQuery>;
-export type ActiveCustomerDetailsQueryResult = Apollo.QueryResult<ActiveCustomerDetailsQuery, ActiveCustomerDetailsQueryVariables>;
 export const ActiveCustomerAddressesDocument = gql`
     query activeCustomerAddresses {
   activeCustomer {
     id
     addresses {
-      id
-      company
-      fullName
-      streetLine1
-      streetLine2
-      city
-      province
-      postalCode
-      country {
-        id
-        code
-        name
-      }
-      phoneNumber
-      defaultShippingAddress
-      defaultBillingAddress
+      ...ActiveCustomerAddresses
     }
   }
 }
-    `;
+    ${ActiveCustomerAddressesFragmentDoc}`;
 
 /**
  * __useActiveCustomerAddressesQuery__

@@ -1,150 +1,103 @@
 'use client';
 
-import { useContext } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useMutation, useLazyQuery } from '@apollo/client';
 // import useStorage from '@/utils/sessions';
 import {
-  AddPaymentToOrderMutation as AddPaymentToOrderMutationType,
   CurrencyCode,
-  ErrorCode,
-  ErrorResult,
-  NextOrderStatesQuery as NextOrderStatesQueryType,
-  TransitionOrderToStateMutation as TransitionOrderToStateMutationType,
+  EligiblePaymentMethodsQuery as EligiblePaymentMethodsQueryType,
 } from '@/graphql-types.generated';
-import { StripePayments } from '@/components/checkout/stripe/stripe-payments';
-import DummyPayments from '@/components/checkout/dummy-payments';
-import { BraintreeDropIn } from '@/components/checkout/braintree/braintree-payments';
-import { ActiveOrderContext } from '@/lib/active-order-wrapper';
-import { usePaymentPageData } from '@/utils/use-payment-page-data';
-import {
-  AddPaymentToOrderMutation,
-  NextOrderStatesQuery,
-  TransitionOrderToStateMutation,
-} from '@/providers/checkout/checkout';
-
-function getPaymentError(error?: ErrorResult): string | undefined {
-  if (!error || !error.errorCode) {
-    return undefined;
-  }
-  switch (error.errorCode) {
-    case ErrorCode.OrderPaymentStateError:
-    case ErrorCode.IneligiblePaymentMethodError:
-    case ErrorCode.PaymentFailedError:
-    case ErrorCode.PaymentDeclinedError:
-    case ErrorCode.OrderStateTransitionError:
-    case ErrorCode.NoActiveOrderError:
-      return error.message;
-  }
-}
+import StripePayments from '@/components/checkout/stripe/stripe-payments';
+import BraintreeDropIn from '@/components/checkout/braintree/braintree-payments';
+import { useActiveOrder } from '@/utils/use-active-order';
+import { useBraintree } from '@/utils/checkout/use-braintree';
+import { useStripe } from '@/utils/checkout/use-stripe';
+import { useSuspenseQuery } from '@apollo/client';
+import { EligiblePaymentMethodsQuery } from '@/providers/checkout/checkout';
+import { useAddPaymentToOrderData } from '@/utils/checkout/use-add-payment-to-order';
+import LoadingPage from '@/components/loading';
+import Message from '@/components/message';
 
 const CheckoutPayment = () => {
   const router = useRouter();
-  const { data, loading, error } = usePaymentPageData({ router }) || {};
+  const { activeOrder } = useActiveOrder();
+
+  const [processing, setProcessing] = useState(false);
+
+  const { data, error } = useSuspenseQuery<EligiblePaymentMethodsQueryType>(
+    EligiblePaymentMethodsQuery,
+  );
+
+  const { error: braintreeError, key: braintreeKey } = useBraintree({
+    eligiblePaymentMethods: data?.eligiblePaymentMethods,
+  });
 
   const {
-    eligiblePaymentMethods,
-    stripePaymentIntent,
-    stripePublishableKey,
-    stripeError,
-    brainTreeKey,
-    brainTreeError,
-  } = data ?? {};
-  const { activeOrderFetcher, activeOrder } = useContext(ActiveOrderContext);
-  const [addPaymentToOrder, { data: addPaymentToOrderData }] =
-    useMutation<AddPaymentToOrderMutationType>(AddPaymentToOrderMutation);
-  const [getNextOrderStates] =
-    useLazyQuery<NextOrderStatesQueryType>(NextOrderStatesQuery);
-  const [transitionOrderToState] =
-    useLazyQuery<TransitionOrderToStateMutationType>(
-      TransitionOrderToStateMutation,
-    );
+    error: stripeError,
+    key: stripeKey,
+    intent: stripeIntent,
+  } = useStripe({
+    eligiblePaymentMethods: data?.eligiblePaymentMethods,
+  });
 
-  const paymentError = 'Error'; // getPaymentError(error);
+  const { addPaymentToOrder, error: orderError } = useAddPaymentToOrderData();
 
-  const submitForm = async ({ paymentMethodCode, paymentNonce }) => {
-    if (typeof paymentMethodCode === 'string') {
-      const { data: nextOrderStates } = await getNextOrderStates();
-
-      if (nextOrderStates?.nextOrderStates?.includes('ArrangingPayment')) {
-        const { data: transitionResult } = await transitionOrderToState({
-          variables: { state: 'ArrangingPayment' },
-        });
-
-        if (transitionResult?.transitionOrderToState?.__typename !== 'Order') {
-          // throw new Response('Not Found', {
-          //   status: 400,
-          //   statusText: transitionResult?.transitionOrderToState?.message,
-          // });
-        }
-      }
-
-      addPaymentToOrder({
-        variables: {
-          method: paymentMethodCode,
-          metadata: { nonce: paymentNonce },
-        },
-      });
-    }
-  };
-
-  if (addPaymentToOrderData?.addPaymentToOrder.__typename === 'Order') {
-    return router.push(
-      `/checkout/confirmation/${addPaymentToOrderData.addPaymentToOrder.code}`,
-    );
+  if (processing) {
+    return <LoadingPage text="Processing order..." />;
   }
 
-  // if (addPaymentToOrderData?.addPaymentToOrder.__typename !== 'OrderError') {
-  // throw new Response('Not Found', {
-  //   status: 400,
-  //   statusText: result.addPaymentToOrder?.message,
-  // });
-  // }
+  // If there is no active order
+  if (!activeOrder || !activeOrder.active || activeOrder.lines.length === 0) {
+    router.push('/');
+
+    return <LoadingPage />;
+  }
+
+  if (error || orderError) {
+    return <Message text="Sorry, there was an error" type="error" />;
+  }
 
   return (
     <div>
-      {eligiblePaymentMethods?.map((paymentMethod) =>
-        paymentMethod.code.includes('braintree') ? (
+      {data?.eligiblePaymentMethods?.map((paymentMethod) =>
+        paymentMethod.code.includes('braintree') && braintreeKey ? (
           <div key={paymentMethod.id}>
-            {brainTreeError ? (
+            {braintreeError ? (
               <div>
                 <p>Braintree error:</p>
-                <p>{brainTreeError}</p>
+                <p>{braintreeError.message}</p>
               </div>
             ) : (
               <BraintreeDropIn
-                fullAmount={activeOrder?.totalWithTax ?? 0}
-                currencyCode={
-                  activeOrder?.currencyCode ?? ('USD' as CurrencyCode)
-                }
-                show={true}
-                authorization={brainTreeKey!}
+                fullAmount={activeOrder.totalWithTax ?? 0}
+                currencyCode={activeOrder.currencyCode ?? CurrencyCode.Aud}
+                authorization={braintreeKey}
+                addPaymentToOrder={addPaymentToOrder}
+                setProcessing={setProcessing}
+                processing={processing}
               />
             )}
           </div>
-        ) : paymentMethod.code.includes('stripe') ? (
+        ) : paymentMethod.code.includes('stripe') &&
+          stripeKey &&
+          stripeIntent ? (
           <div key={paymentMethod.id}>
             {stripeError ? (
               <div>
                 <p>Stripe error:</p>
-                <p>{stripeError}</p>
+                <p>{stripeError.message}</p>
               </div>
             ) : (
               <StripePayments
-                orderCode={activeOrder?.code ?? ''}
-                clientSecret={stripePaymentIntent!}
-                publishableKey={stripePublishableKey!}
+                orderCode={activeOrder.code}
+                clientSecret={stripeIntent}
+                publishableKey={stripeKey}
+                // setProcessing={setProcessing}
+                // processing={processing}
               />
             )}
           </div>
-        ) : (
-          <div key={paymentMethod.id}>
-            <DummyPayments
-              paymentMethod={paymentMethod}
-              paymentError={paymentError}
-            />
-          </div>
-        ),
+        ) : null,
       )}
     </div>
   );

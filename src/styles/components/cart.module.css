@@ -1,0 +1,98 @@
+.drawer {
+  background-color: var(--colour-background) !important;
+  color: var(--colour-text) !important;
+  fill: var(--colour-text) !important;
+}
+
+.cart {
+}
+
+.cart h3 {
+  font-size: var(--font-size-l);
+  line-height: var(--line-height-l);
+  margin-bottom: var(--spacing-m);
+}
+
+.item {
+  display: grid;
+  grid-template-columns: minmax(80px, 20%) 1fr 20px;
+  grid-gap: var(--spacing-m);
+  margin-bottom: var(--spacing-m);
+}
+
+.item:not(:last-of-type) {
+  margin-bottom: var(--spacing-m);
+}
+
+.image img {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--border-radius-m);
+}
+
+.title {
+  font-size: var(--font-size-m);
+  line-height: var(--line-height-m);
+}
+
+.price {
+  font-size: var(--font-size-s);
+  line-height: var(--line-height-s);
+  color: var(--colour-text-secondary);
+  margin-top: var(--spacing-xs);
+}
+
+.quantity {
+  display: flex;
+  align-items: center;
+  margin-top: var(--spacing-s);
+}
+
+.quantity label {
+  margin-right: var(--spacing-s);
+}
+
+.remove {
+}
+
+.button {
+  display: block;
+  padding: 0;
+  border: 0;
+  width: 20px;
+  height: 20px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.button svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+
+/* Totals */
+.totals {
+  margin-top: var(--spacing-m);
+  padding-top: var(--spacing-m);
+  border-top: 1px solid var(--colour-outline);
+}
+
+.total {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-bottom: var(--spacing-s);
+  font-size: var(--font-size-m);
+  line-height: var(--line-height-m);
+}
+
+.calculated {
+  font-size: var(--font-size-s);
+  line-height: var(--line-height-s);
+}
+
+.checkout {
+  margin-top: var(--spacing-m);
+}

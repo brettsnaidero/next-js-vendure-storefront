@@ -1,16 +1,18 @@
 'use client';
 
-import { ActiveCustomerOrderListQuery as ActiveCustomerOrderListQueryType } from '@/graphql-types.generated';
-
-import { ActiveCustomerOrderListQuery } from '@/providers/customer/customer';
-import { Pagination } from '@/components/pagination';
-import OrderHistoryItem from '@/components/account/order-history-item';
-
-import { paginationValidationSchema } from '@/utils/pagination';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
 import { useSuspenseQuery } from '@apollo/client';
-import { useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { ActiveCustomerOrderListQuery as ActiveCustomerOrderListQueryType } from '@/graphql-types.generated';
+import { ActiveCustomerOrderListQuery } from '@/providers/customer/customer';
+import Pagination from '@/components/pagination';
+import OrderHistoryItem from '@/components/account/order-history-item';
+import {
+  paginationValidationSchema,
+  translatePaginationFrom,
+  translatePaginationTo,
+} from '@/utils/pagination';
+import { LIMIT, PAGE } from '@/utils/use-filtered-product-search';
+import styles from '@/styles/pages/account.module.css';
 
 const paginationLimitMinimumDefault = 10;
 const allowedPaginationLimits = new Set<number>([
@@ -19,65 +21,79 @@ const allowedPaginationLimits = new Set<number>([
   30,
 ]);
 
+const searchPaginationSchema = paginationValidationSchema(
+  allowedPaginationLimits,
+);
+
 const AccountHistory = () => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const { data } = useSuspenseQuery<ActiveCustomerOrderListQueryType>(
     ActiveCustomerOrderListQuery,
   );
 
-  // TODO: translatePaginationFrom(appliedPaginationPage, appliedPaginationLimit)
-  const showingOrdersFrom = 1;
-  const showingOrdersTo = 4;
-  const appliedPaginationLimit = 1;
-  const appliedPaginationPage = 1;
+  const limit = searchParams.get(LIMIT) ?? paginationLimitMinimumDefault;
+  const page = searchParams.get(PAGE) ?? 1;
 
-  // TODO: Register inputs/form
-  const { register, handleSubmit, watch } = useForm({
-    resolver: zodResolver(paginationValidationSchema(allowedPaginationLimits)),
-  });
+  const zodResult = searchPaginationSchema.safeParse({ limit, page });
 
-  // TODO: Handle form submit
-  const onSubmit = (data) => console.log(data);
+  if (!zodResult.success) {
+    router.replace('/account/history');
 
-  useEffect(() => {
-    // TypeScript users
-    const subscription = watch(() => handleSubmit(onSubmit));
-    return () => subscription.unsubscribe();
-  }, [handleSubmit, watch]);
+    return <div>Loading...</div>;
+  }
+
+  if (!data.activeCustomer) {
+    router.replace('/');
+
+    return <div>Loading...</div>;
+  }
+
+  const appliedPaginationPage = zodResult.data.page;
+  const appliedPaginationLimit = zodResult.data.limit;
 
   return (
     <div>
-      {data?.activeCustomer?.orders.items.length === 0 && (
-        <div>
-          {data?.activeCustomer.orders.totalItems === 0
+      {data.activeCustomer.orders.items.length === 0 && (
+        <div className={styles.nothing}>
+          {data.activeCustomer.orders.totalItems === 0
             ? 'Your future orders will appear here'
             : 'No more orders, end reached'}
         </div>
       )}
-      {/* The actual orders */}
-      {data?.activeCustomer?.orders.items?.map((item) => (
-        <OrderHistoryItem
-          key={item.code}
-          // @ts-ignore
-          order={item}
-          isInitiallyExpanded={true}
-        />
+
+      {data.activeCustomer.orders.items.map((item) => (
+        <OrderHistoryItem key={item.code} order={item} />
       ))}
 
       {/* Pagination */}
       <div>
-        <span>
-          Showing orders {showingOrdersFrom} to {showingOrdersTo} of{' '}
-          {data?.activeCustomer?.orders.totalItems}
-        </span>
+        <div className={styles.pagination}>
+          Showing orders{' '}
+          <strong>
+            {translatePaginationFrom(
+              appliedPaginationPage,
+              appliedPaginationLimit,
+            )}
+          </strong>{' '}
+          to{' '}
+          <strong>
+            {translatePaginationTo(
+              appliedPaginationPage,
+              appliedPaginationLimit,
+              data.activeCustomer.orders.totalItems,
+            )}
+          </strong>{' '}
+          of <strong>{data.activeCustomer.orders.totalItems}</strong>
+        </div>
 
-        <form>
-          <Pagination
-            appliedPaginationLimit={appliedPaginationLimit}
-            allowedPaginationLimits={allowedPaginationLimits}
-            totalItems={data?.activeCustomer?.orders.totalItems}
-            appliedPaginationPage={appliedPaginationPage}
-          />
-        </form>
+        <Pagination
+          basePath="/account/history"
+          totalItems={data.activeCustomer.orders.totalItems}
+          allowedPaginationLimits={allowedPaginationLimits}
+          appliedPaginationLimit={appliedPaginationLimit}
+          appliedPaginationPage={appliedPaginationPage}
+        />
       </div>
     </div>
   );

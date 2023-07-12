@@ -2,138 +2,170 @@ import {
   AvailableCountriesQuery,
   OrderAddress,
 } from '@/graphql-types.generated';
+import { useForm } from 'react-hook-form';
+import Select from '@/components/form/select';
+import Input from '@/components/form/input';
+import Field from '@/components/form/field';
 
-export function AddressForm({
+export interface ShippingForm {
+  fullName?: string;
+  company?: string;
+  addressLine1: string;
+  addressLine2?: string;
+  city?: string;
+  country: string;
+  state?: string;
+  postalCode?: string;
+  phone?: string;
+}
+
+const AddressForm = ({
   address,
   defaultFullName,
   availableCountries,
+  onChange,
+  setAddressFormChanged,
 }: {
   address?: OrderAddress | null;
   defaultFullName?: string;
   availableCountries?: AvailableCountriesQuery['availableCountries'];
-}) {
+  onChange: (address: ShippingForm) => void;
+  setAddressFormChanged: (value: boolean) => void;
+}) => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ShippingForm>({
+    defaultValues: {
+      fullName: defaultFullName ?? '',
+      company: address?.company ?? '',
+      addressLine1: address?.streetLine1 ?? '',
+      addressLine2: address?.streetLine2 ?? '',
+      city: address?.city ?? '',
+      country: address?.countryCode ?? 'AU',
+      state: address?.province ?? '',
+      postalCode: address?.postalCode ?? '',
+      phone: address?.phoneNumber ?? '',
+    },
+  });
+
   return (
-    <div>
-      <div>
-        <label htmlFor="fullName">First name</label>
-        <div>
-          <input
-            type="text"
-            id="fullName"
-            name="fullName"
-            defaultValue={defaultFullName}
-            autoComplete="given-name"
-          />
-        </div>
-      </div>
+    <form
+      onBlur={handleSubmit(onChange)}
+      onChange={() => setAddressFormChanged(true)}
+    >
+      <Field label="Name" htmlFor="address-form__name">
+        <Input
+          type="text"
+          id="address-form__name"
+          autoComplete="given-name"
+          {...register('fullName')}
+          stretched
+        />
+      </Field>
 
-      <div>
-        <label htmlFor="company">Company</label>
-        <div>
-          <input
-            type="text"
-            name="company"
-            id="company"
-            defaultValue={address?.company ?? ''}
-          />
-        </div>
-      </div>
+      <Field label="Company" htmlFor="address-form__company">
+        <Input
+          type="text"
+          id="address-form__company"
+          {...register('company')}
+          stretched
+        />
+      </Field>
 
-      <div>
-        <label htmlFor="streetLine1">Address</label>
-        <div>
-          <input
-            type="text"
-            name="streetLine1"
-            id="streetLine1"
-            defaultValue={address?.streetLine1 ?? ''}
-            autoComplete="street-address"
-          />
-        </div>
-      </div>
+      <Field
+        label="Address"
+        htmlFor="address-form__street-line-1"
+        required
+        errorMessage={errors.addressLine1?.message}
+      >
+        <Input
+          type="text"
+          id="address-form__street-line-1"
+          autoComplete="street-address"
+          {...register('addressLine1', { required: true })}
+          stretched
+        />
+      </Field>
 
-      <div>
-        <label htmlFor="streetLine2">Apartment, suite, etc.</label>
-        <div>
-          <input
-            type="text"
-            name="streetLine2"
-            id="streetLine2"
-            defaultValue={address?.streetLine2 ?? ''}
-          />
-        </div>
-      </div>
+      <Field
+        label="Apartment, suite, etc."
+        htmlFor="address-form__street-line-2"
+      >
+        <Input
+          type="text"
+          id="address-form__street-line-2"
+          {...register('addressLine2')}
+          stretched
+        />
+      </Field>
 
-      <div>
-        <label htmlFor="city">City</label>
-        <div>
-          <input
-            type="text"
-            name="city"
-            id="city"
-            autoComplete="address-level2"
-            defaultValue={address?.city ?? ''}
-          />
-        </div>
-      </div>
+      <Field label="City" htmlFor="address-form__city">
+        <Input
+          type="text"
+          id="address-form__city"
+          autoComplete="address-level2"
+          {...register('city')}
+          stretched
+        />
+      </Field>
 
-      <div>
-        <label htmlFor="countryCode">Country</label>
-        <div>
-          {availableCountries && (
-            <select
-              id="countryCode"
-              name="countryCode"
-              defaultValue={address?.countryCode ?? 'US'}
-            >
-              {availableCountries.map((item) => (
-                <option key={item.id} value={item.code}>
-                  {item.name}
-                </option>
-              ))}
-            </select>
-          )}
-        </div>
-      </div>
-
-      <div>
-        <label htmlFor="province">State / Province</label>
-        <div>
-          <input
-            type="text"
-            name="province"
-            id="province"
-            defaultValue={address?.province ?? ''}
-            autoComplete="address-level1"
+      <Field
+        label="Country"
+        htmlFor="address-form__country-code"
+        errorMessage={errors.country?.message}
+        required
+      >
+        {availableCountries && (
+          <Select
+            id="address-form__country-code"
+            {...register('country', { required: true })}
+            options={availableCountries.map((item) => ({
+              value: item.code,
+              label: item.name,
+            }))}
+            stretched
           />
-        </div>
-      </div>
+        )}
+      </Field>
 
-      <div>
-        <label htmlFor="postalCode">Postal code</label>
-        <div>
-          <input
-            type="text"
-            name="postalCode"
-            id="postalCode"
-            defaultValue={address?.postalCode ?? ''}
-            autoComplete="postal-code"
-          />
-        </div>
-      </div>
+      <Field label="State / Province" htmlFor="address-form__province">
+        <Input
+          type="text"
+          id="address-form__province"
+          autoComplete="address-level1"
+          {...register('state')}
+          stretched
+        />
+      </Field>
 
-      <div>
-        <label htmlFor="phoneNumber">Phone</label>
-        <div>
-          <input
-            type="text"
-            name="phoneNumber"
-            id="phoneNumber"
-            defaultValue={address?.phoneNumber ?? ''}
-            autoComplete="tel"
-          />
-        </div>
-      </div>
-    </div>
+      <Field
+        label="Postal code"
+        htmlFor="address-form__postal-code"
+        required
+        errorMessage={errors.postalCode?.message}
+      >
+        <Input
+          type="text"
+          id="address-form__postal-code"
+          autoComplete="postal-code"
+          {...register('postalCode', { required: true })}
+          stretched
+        />
+      </Field>
+
+      <Field label="Phone" htmlFor="address-form__phone-number">
+        <Input
+          type="tel"
+          id="address-form__phone-number"
+          autoComplete="tel"
+          {...register('phone')}
+          stretched
+        />
+      </Field>
+    </form>
   );
-}
+};
+
+export default AddressForm;

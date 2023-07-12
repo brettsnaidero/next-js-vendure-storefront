@@ -1,0 +1,25 @@
+.page {
+  padding: var(--spacing-l) 0;
+  text-align: center;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  margin: 0 auto;
+  width: 20px;
+  height: 20px;
+  animation: spin 1s infinite linear;
+  margin-bottom: var(--spacing-s);
+}
+
+.spinner svg {
+  display: block;
+}

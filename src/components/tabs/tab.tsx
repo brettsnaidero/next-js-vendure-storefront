@@ -1,27 +1,34 @@
+import clsx from 'clsx';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-
-type IconElement = React.SVGProps<SVGSVGElement> & {
-  title?: string;
-  titleId?: string;
-};
+import styles from '@/styles/components/tabs.module.css';
 
 export type TabProps = {
-  Icon: React.FC<IconElement>;
+  Icon: React.ForwardRefExoticComponent<
+    Omit<React.SVGProps<SVGSVGElement>, 'ref'> & {
+      title?: string | undefined;
+      titleId?: string | undefined;
+    } & React.RefAttributes<SVGSVGElement>
+  >;
   text: string;
   to: string;
 };
 
-export const Tab = ({ Icon, text, to }: TabProps) => {
+const Tab = ({ Icon, text, to }: TabProps) => {
   const pathname = usePathname();
-  const isActive = true; // TODO: matches.find((match) => match.pathname === pathname);
+  const isActive = pathname === to;
 
   return (
-    <li className={isActive ? `cursor-default` : `cursor-pointer`}>
-      <Link href={to} className={`${isActive ? 'active' : ''}`}>
-        <Icon className={`${isActive ? 'active' : ''}`} />
-        <p>{text}</p>
+    <li className={clsx([styles.tab, isActive ? styles.active : null])}>
+      <Link
+        href={to}
+        className={clsx([styles.link, isActive ? styles.active : null])}
+      >
+        <Icon width={20} height={20} />
+        <span>{text}</span>
       </Link>
     </li>
   );
 };
+
+export default Tab;

@@ -1,30 +1,28 @@
+import clsx from 'clsx';
+import styles from '@/styles/components/status.module.css';
+
 export type StockLevel = 'IN_STOCK' | 'OUT_OF_STOCK' | 'LOW_STOCK';
 
 const StockLevelLabel = ({ stockLevel }: { stockLevel?: string }) => {
   let stockLevelLabel = '';
-  let badgeClasses = 'bg-gray-100 text-gray-800';
+  let badgeClasses = '';
   switch (stockLevel as StockLevel) {
     case 'IN_STOCK':
       stockLevelLabel = 'In stock';
-      badgeClasses = 'bg-green-100 text-green-800';
+      badgeClasses = styles.success;
       break;
     case 'OUT_OF_STOCK':
       stockLevelLabel = 'Out of stock';
-      badgeClasses = 'bg-red-100 text-red-800';
+      badgeClasses = styles.error;
       break;
     case 'LOW_STOCK':
       stockLevelLabel = 'Low stock';
-      badgeClasses = 'bg-yellow-100 text-yellow-800';
+      badgeClasses = styles.warning;
       break;
   }
 
   return (
-    <span
-      className={
-        'inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ' +
-        badgeClasses
-      }
-    >
+    <span className={clsx([styles.level, badgeClasses])}>
       {stockLevelLabel}
     </span>
   );

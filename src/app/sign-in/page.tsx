@@ -1,149 +1,170 @@
 'use client';
 
+import React, { useContext, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { LoginMutation } from '@/providers/account/account';
-import { XCircleIcon } from '@heroicons/react/24/solid';
-('use client');
-
-import { Button } from '@/components/button';
-import { ArrowPathIcon } from '@heroicons/react/24/solid';
-import { useMutation } from '@apollo/client';
 import { useForm } from 'react-hook-form';
-import { LoginMutation as LoginMutationType } from '@/graphql-types.generated';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { ArrowPathIcon } from '@heroicons/react/24/solid';
+import Button from '@/components/button';
+import styles from '@/styles/pages/sign-in.module.css';
+import Field from '@/components/form/field';
+import Input from '@/components/form/input';
+import Checkbox from '@/components/form/checkbox';
+import Message from '@/components/message';
+import { ActiveCustomerContext } from '@/lib/active-customer-wrapper';
+import { useLoginMutation } from '@/graphql-types.generated';
+import { ActiveOrderContext } from '@/lib/active-order-wrapper';
 
-interface FormData {
+export interface LogInFormData {
   email: string;
   password: string;
-  rememberMe: boolean;
+  remember: boolean;
 }
 
-const SignInPage = async () => {
+const SignInPage = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const [invalidError, setInvalidError] = useState(false);
+
+  const [logIn, { data: logInData, loading: logInloading }] =
+    useLoginMutation();
+
+  const { refresh } = useContext(ActiveOrderContext);
+  const { activeCustomer, refetch } = useContext(ActiveCustomerContext);
+
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormData>();
-  const [postLogin, { data, error }] =
-    useMutation<LoginMutationType>(LoginMutation);
+  } = useForm<LogInFormData>({
+    defaultValues: {
+      email: 'test@vendure.io',
+      password: 'test',
+      remember: true,
+    },
+  });
 
-  const submitForm = ({ email, password, rememberMe }: FormData) => {
-    postLogin({
+  const submit = (data: LogInFormData) => {
+    logIn({
       variables: {
-        email,
-        password,
-        rememberMe,
+        email: data.email,
+        password: data.password,
+        rememberMe: data.remember,
       },
     });
   };
 
-  if (data?.login?.__typename === 'CurrentUser') {
-    const redirectTo = (searchParams.get('redirectTo') || '/account') as string;
+  useEffect(() => {
+    if (logInData?.login?.__typename === 'CurrentUser') {
+      const redirectTo = searchParams.get('redirectTo') || '/account';
 
-    return router.push(redirectTo);
-  }
+      // Refresh customer and cart data
+      refetch();
+      refresh?.();
+
+      router.push(redirectTo);
+    } else if (logInData?.login?.__typename === 'InvalidCredentialsError') {
+      // do nothing
+      setInvalidError(true);
+    } else if (logInData?.login?.__typename === 'NotVerifiedError') {
+      router.push('/verify-email-address');
+    }
+  }, [logInData, router, searchParams]);
+
+  useEffect(() => {
+    if (activeCustomer?.id) {
+      router.push('/account');
+    }
+  }, [activeCustomer, router]);
 
   return (
-    <div>
-      <div>
+    <div className={styles.page}>
+      <div className={styles.heading}>
         <h2>Sign in to your account</h2>
         <p>
           Or <Link href="/sign-up">register a new account</Link>
         </p>
       </div>
 
-      <div>
+      <div className={styles.layout}>
         <div>
-          <div>
-            <p>Demo credentials</p>
-            <p>
-              Email address: <span>test@vendure.io</span>
-            </p>
-            <p>
-              Password: <span>test</span>
-            </p>
-          </div>
-          <form onSubmit={handleSubmit(submitForm)}>
-            <fieldset disabled={!!error}>
-              <input
-                type="hidden"
-                name="redirectTo"
-                value={searchParams.get('redirectTo') ?? undefined}
-              />
-              <div>
-                <label htmlFor="email">Email address</label>
-                <div>
-                  <input
-                    id="email"
-                    type="email"
-                    autoComplete="email"
-                    required
-                    defaultValue="test@vendure.io"
-                    placeholder="Email address"
-                    {...register('email')}
-                  />
-                  {errors?.email && errors.email.message}
-                </div>
+          <form onSubmit={handleSubmit(submit)}>
+            <fieldset disabled={logInloading}>
+              <Field
+                label="Email address"
+                htmlFor="sign-in__email"
+                required
+                errorMessage={errors.email?.message}
+              >
+                <Input
+                  id="sign-in__email"
+                  type="email"
+                  autoComplete="email"
+                  placeholder="Email address"
+                  {...register('email', { required: true })}
+                  stretched
+                />
+              </Field>
+
+              <Field
+                label="Password"
+                htmlFor="sign-in__password"
+                required
+                errorMessage={errors.password?.message}
+              >
+                <Input
+                  id="sign-in__password"
+                  type="password"
+                  autoComplete="current-password"
+                  placeholder="Password"
+                  {...register('password', { required: true })}
+                  stretched
+                />
+              </Field>
+
+              <Field>
+                <Checkbox id="sign-in__remember-me" {...register('remember')}>
+                  <label htmlFor="sign-in__remember-me">Remember me</label>
+                </Checkbox>
+              </Field>
+
+              <div className={styles.block}>
+                <Link href="/forgot-password">Forgot your password?</Link>
               </div>
 
-              <div>
-                <label htmlFor="password">Password</label>
-                <div>
-                  <input
-                    id="password"
-                    type="password"
-                    autoComplete="current-password"
-                    required
-                    placeholder="Password"
-                    defaultValue="test"
-                    {...register('password')}
+              {invalidError && (
+                <div className={styles.block}>
+                  <Message
+                    type="error"
+                    text="Sorry, we couldn't log you in."
+                    closable
                   />
-                  {errors?.password && errors.password.message}
-                </div>
-              </div>
-
-              <div>
-                <div>
-                  <input
-                    id="rememberMe"
-                    type="checkbox"
-                    {...register('rememberMe')}
-                    defaultChecked
-                  />
-                  <label htmlFor="rememberMe">Remember me</label>
-                </div>
-
-                <div>
-                  <Link href="/forgot-password">Forgot your password?</Link>
-                </div>
-              </div>
-
-              {error && (
-                <div>
-                  <div>
-                    <div>
-                      <XCircleIcon aria-hidden="true" />
-                    </div>
-                    <div>
-                      <h3>We ran into a problem signing you in!</h3>
-                      <p>{error.message}</p>
-                    </div>
-                  </div>
                 </div>
               )}
 
-              <div>
-                <Button type="submit">
-                  <span>
-                    {!error && <ArrowPathIcon />}
-                    Sign in
-                  </span>
+              <div className={styles.block}>
+                <Button
+                  type="submit"
+                  icon={
+                    logInloading ? (
+                      <ArrowPathIcon width={20} height={20} />
+                    ) : null
+                  }
+                  size="large"
+                >
+                  Sign in
                 </Button>
               </div>
             </fieldset>
           </form>
+        </div>
+
+        <div>
+          <Message
+            headingText="Demo credentials"
+            text="Email address: test@vendure.io, Password: test"
+            size="large"
+          />
         </div>
       </div>
     </div>

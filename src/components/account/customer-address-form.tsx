@@ -1,9 +1,14 @@
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Address, AvailableCountriesQuery } from '@/graphql-types.generated';
-import { Input } from '@/components/input';
-import { Select } from '@/components/select';
+import Select from '@/components/form/select';
+import {
+  ActiveCustomerAddressesQuery,
+  AvailableCountriesQuery,
+} from '@/graphql-types.generated';
 import { useForm } from 'react-hook-form';
+import Button, { ButtonTray } from '@/components/button';
+import Input from '@/components/form/input';
+import Field from '@/components/form/field';
 
 export const validator = z.object({
   fullName: z.string().min(1, { message: 'Name is required' }),
@@ -17,17 +22,42 @@ export const validator = z.object({
   company: z.string(),
 });
 
+export interface CustomerAddressFormFields {
+  fullName: string;
+  city: string;
+  streetLine1: string;
+  streetLine2: string;
+  countryCode: string;
+  postalCode: string;
+  phone: string;
+  company: string;
+  province: string;
+}
+
+// Utility to lookup optional array types
+type Unpacked<T> = T extends (infer U)[] ? U : T;
+
 const CustomerAddressForm = ({
   address,
   submit,
   availableCountries,
+  children,
 }: {
-  address?: Address;
-  submit: () => void;
+  address?: Unpacked<
+    Extract<
+      ActiveCustomerAddressesQuery['activeCustomer'],
+      { __typename?: 'Customer' }
+    >['addresses']
+  >;
+  submit: (data: CustomerAddressFormFields) => void;
   availableCountries: AvailableCountriesQuery['availableCountries'];
+  children?: React.ReactNode;
 }) => {
-  // TODO: Hook up to inputs/form
-  const { register, handleSubmit } = useForm({
+  const {
+    register,
+    handleSubmit,
+    formState: { isValid, errors },
+  } = useForm<CustomerAddressFormFields>({
     resolver: zodResolver(validator),
     defaultValues: {
       fullName: address?.fullName || undefined,
@@ -43,57 +73,146 @@ const CustomerAddressForm = ({
   });
 
   return (
-    <form id="editAddressForm" method="post" onSubmit={handleSubmit(submit)}>
-      <div>
-        <div>
-          <Input
-            label="Full name"
-            name="fullName"
-            required
-            autoComplete="full-name"
-          />
-        </div>
-        <Input label="Company" name="company" />
+    <form id="edit-address-form" onSubmit={handleSubmit(submit)}>
+      <Field
+        label="Full name"
+        htmlFor="edit-address-form__full-name"
+        errorMessage={errors.fullName?.message}
+        required
+      >
         <Input
-          label="Address"
-          name="streetLine1"
-          required
+          type="text"
+          id="edit-address-form__full-name"
+          autoComplete="full-name"
+          {...register('fullName', { required: true })}
+          stretched
+        />
+      </Field>
+
+      <Field
+        label="Company"
+        htmlFor="edit-address-form__company"
+        errorMessage={errors.company?.message}
+      >
+        <Input
+          type="text"
+          id="edit-address-form__company"
+          {...register('company')}
+          stretched
+        />
+      </Field>
+      <Field
+        label="Address"
+        htmlFor="edit-address-form__address-line1"
+        errorMessage={errors.streetLine1?.message}
+        required
+      >
+        <Input
+          type="text"
+          id="edit-address-form__address-line1"
           autoComplete="address-line1"
+          {...register('streetLine1', { required: true })}
+          stretched
         />
+      </Field>
+
+      <Field
+        label="Apartment, suite, etc."
+        htmlFor="edit-address-form__address-line2"
+        errorMessage={errors.streetLine2?.message}
+      >
         <Input
-          label="Apartment, suite, etc."
-          name="streetLine2"
+          type="text"
+          id="edit-address-form__address-line2"
           autoComplete="address-line2"
+          {...register('streetLine2')}
+          stretched
         />
-        <div>
-          <Input
-            label="Postal code"
-            name="postalCode"
-            required
-            autoComplete="postal-code"
-          />
-          <Input label="City" name="city" required autoComplete="locality" />
-        </div>
+      </Field>
+
+      <Field
+        label="Postal code"
+        htmlFor="edit-address-form__postal-code"
+        errorMessage={errors.postalCode?.message}
+        required
+      >
         <Input
-          label="Province / State"
-          name="province"
-          autoComplete="address-level1"
+          type="text"
+          id="edit-address-form__postal-code"
+          autoComplete="postal-code"
+          {...register('postalCode', { required: true })}
+          stretched
         />
+      </Field>
+
+      <Field
+        label="City"
+        htmlFor="edit-address-form__city"
+        errorMessage={errors.city?.message}
+        required
+      >
+        <Input
+          type="text"
+          id="edit-address-form__city"
+          autoComplete="locality"
+          {...register('city', { required: true })}
+          stretched
+        />
+      </Field>
+
+      <Field
+        label="Province / State"
+        htmlFor="edit-address-form__province"
+        errorMessage={errors.province?.message}
+      >
+        <Input
+          type="text"
+          id="edit-address-form__province"
+          autoComplete="address-level1"
+          {...register('province')}
+          stretched
+        />
+      </Field>
+
+      <Field
+        label="Country"
+        htmlFor="edit-address-form__country"
+        errorMessage={errors.countryCode?.message}
+        required
+      >
         <Select
-          name="countryCode"
           autoComplete="country"
+          id="edit-address-form__country"
           placeholder="Select a country..."
-          required
-          label="Country"
-        >
-          {availableCountries?.map((country) => (
-            <option key={country.id} value={country.code}>
-              {country.name}
-            </option>
-          ))}
-        </Select>
-        <Input label="Phone" name="phone" autoComplete="phone" />
-      </div>
+          options={availableCountries?.map((country) => ({
+            label: country.name,
+            value: country.code,
+          }))}
+          {...register('countryCode', { required: true })}
+          stretched
+        />
+      </Field>
+
+      <Field
+        label="Phone"
+        htmlFor="edit-address-form__phone"
+        errorMessage={errors.phone?.message}
+      >
+        <Input
+          type="tel"
+          id="edit-address-form__phone"
+          autoComplete="phone"
+          {...register('phone')}
+          stretched
+        />
+      </Field>
+
+      <ButtonTray>
+        {children}
+        <Button type="submit" disabled={!isValid}>
+          Submit
+        </Button>
+      </ButtonTray>
     </form>
   );
 };

@@ -1,17 +1,15 @@
-import { PencilIcon } from '@heroicons/react/24/outline';
+'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { z } from 'zod';
-import { Button } from '@/components/button';
-import { ErrorMessage } from '@/components/error-message';
-import { HighlightedButton } from '@/components/highlighted-button';
-import { Input } from '@/components/input';
-import { SuccessMessage } from '@/components/success-message';
-import { UpdateCustomerPasswordMutation } from '@/providers/account/account';
-import { UpdateCustomerPasswordMutation as UpdateCustomerPasswordMutationType } from '@/graphql-types.generated';
-import { useMutation } from '@apollo/client';
-import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { PencilIcon } from '@heroicons/react/24/outline';
+import Button, { ButtonTray } from '@/components/button';
+import { useUpdateCustomerPasswordMutation } from '@/graphql-types.generated';
+import Input from '@/components/form/input';
+import Field from '@/components/form/field';
+import Message from '@/components/message';
 
 export const validator = z
   .object({
@@ -27,34 +25,38 @@ export const validator = z
     },
   );
 
-export default function AccountPassword() {
+interface FormFields {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
+const AccountPassword = () => {
   const [editing, setEditing] = useState(false);
-  const [isSaved, setIsSaved] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string>();
 
-  const [action, { loading }] = useMutation<UpdateCustomerPasswordMutationType>(
-    UpdateCustomerPasswordMutation,
-  );
+  const [updatePassword, { loading, data, error }] =
+    useUpdateCustomerPasswordMutation();
 
-  // TODO: Register inputs/form
-  const { register, reset, handleSubmit } = useForm({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormFields>({
     resolver: zodResolver(validator),
+    defaultValues: {
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+    },
   });
 
-  const submit = () => {
-    action()
-      .then(() => {
-        // Show success message and reset form
-        setErrorMessage(undefined);
-        setIsSaved(true);
-        setEditing(false);
-        reset();
-      })
-      .catch(() => {
-        // Set error message
-        setErrorMessage('Error updating password');
-        setIsSaved(false);
-      });
+  const submit = ({ currentPassword, newPassword }: FormFields) => {
+    updatePassword({
+      variables: {
+        currentPassword,
+        newPassword,
+      },
+    });
   };
 
   return (
@@ -63,64 +65,101 @@ export default function AccountPassword() {
         {editing && (
           <>
             <div>
-              <div>
+              <Field
+                label="Current Password"
+                htmlFor="change-password__current"
+                errorMessage={errors.currentPassword?.message}
+              >
                 <Input
-                  required
-                  label="Current Password"
-                  name="currentPassword"
+                  id="change-password__current"
                   type="password"
+                  {...register('currentPassword')}
+                  stretched
                 />
-              </div>
+              </Field>
             </div>
             <div>
-              <div>
+              <Field
+                label="New Password"
+                htmlFor="change-password__new"
+                errorMessage={errors.newPassword?.message}
+              >
                 <Input
-                  required
-                  label="New Password"
-                  name="newPassword"
+                  id="change-password__new"
                   type="password"
+                  {...register('newPassword')}
+                  stretched
                 />
-              </div>
-              <div>
+              </Field>
+              <Field
+                label="Confirm Password"
+                errorMessage={errors.confirmPassword?.message}
+                htmlFor={'change-password__confirm'}
+              >
                 <Input
-                  required
-                  label="Confirm Password"
-                  name="confirmPassword"
+                  id="change-password__confirm"
                   type="password"
+                  {...register('confirmPassword')}
+                  stretched
                 />
-              </div>
+              </Field>
             </div>
           </>
         )}
-        {isSaved && (
-          <SuccessMessage
-            heading="Success!"
-            message="Your password has been updated."
+
+        {data?.updateCustomerPassword?.__typename === 'Success' && (
+          <Message
+            type="success"
+            headingText="Success!"
+            text="Your password has been updated."
           />
         )}
-        {errorMessage && (
-          <ErrorMessage
-            heading="Password not updated."
-            message={errorMessage}
+
+        {error && (
+          <Message
+            type="error"
+            headingText="Password not updated"
+            text="There was an error reaching the server."
           />
         )}
+
+        {data?.updateCustomerPassword &&
+        data?.updateCustomerPassword.__typename !== 'Success' ? (
+          <Message
+            type="error"
+            headingText="Password not updated"
+            text={data?.updateCustomerPassword?.message}
+          />
+        ) : null}
+
         {editing ? (
-          <div>
-            <HighlightedButton type="submit" isSubmitting={loading}>
+          <ButtonTray>
+            <Button type="submit" disabled={loading}>
               Save Password
-            </HighlightedButton>
-            <Button type="reset" onClick={() => setEditing(false)}>
+            </Button>
+            <Button
+              type="reset"
+              onClick={() => setEditing(false)}
+              role="secondary"
+            >
               Cancel
             </Button>
-          </div>
+          </ButtonTray>
         ) : (
           <>
-            <HighlightedButton type="button" onClick={() => setEditing(true)}>
-              <PencilIcon /> Change Password
-            </HighlightedButton>
+            <Button
+              type="button"
+              onClick={() => setEditing(true)}
+              icon={<PencilIcon width={20} height={20} />}
+              iconPosition="right"
+            >
+              Change Password
+            </Button>
           </>
         )}
       </div>
     </form>
   );
-}
+};
+
+export default AccountPassword;
