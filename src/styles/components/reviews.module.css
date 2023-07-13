@@ -32,7 +32,7 @@
 
 .stars {
   margin-right: var(--spacing-s);
-  color: #f4df9d;
+  color: var(--colour-review);
 }
 
 .actual p {
