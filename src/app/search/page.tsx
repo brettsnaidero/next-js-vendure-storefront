@@ -32,8 +32,8 @@ const Search = () => {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   return (
-    <div className={styles.heading}>
-      <div>
+    <div>
+      <div className={styles.heading}>
         <h2>{result?.search ? `Results for "${term}"` : 'All results'}</h2>
 
         <FiltersButton

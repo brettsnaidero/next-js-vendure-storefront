@@ -1,7 +1,7 @@
 .pagination {
   display: flex;
   align-items: center;
-  margin: var(--spacing-m) 0;
+  margin: var(--spacing-m) 0 var(--spacing-l) 0;
 }
 
 .per {

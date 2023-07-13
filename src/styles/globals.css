@@ -26,10 +26,10 @@
   --font-size-xxl: 48px;
 
   --line-height-xs: 14px;
-  --line-height-s: 18px;
-  --line-height-m: 24px;
-  --line-height-l: 30px;
-  --line-height-xl: 48px;
+  --line-height-s: 20px;
+  --line-height-m: 26px;
+  --line-height-l: 32px;
+  --line-height-xl: 50px;
   --line-height-xxl: 72px;
 
   --breakpoint-m: 720px;
@@ -174,27 +174,4 @@ html.dark {
 
   --colour-error: #2c1618;
   --colour-error-border: #5b2526;
-}
-
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-}
-
-html,
-body {
-  overflow-x: hidden;
-}
-
-body {
-  background-color: var(--colour-background);
-  font-size: var(--font-size-m);
-  line-height: 1.4;
-  color: var(--colour-text);
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
 }

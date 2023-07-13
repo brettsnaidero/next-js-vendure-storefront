@@ -43,7 +43,8 @@
   margin-bottom: var(--spacing-xs);
 }
 
-.columns li a {
+.columns li a:hover {
+  text-decoration: underline;
 }
 
 .subscribe {

@@ -15,18 +15,21 @@
   cursor: pointer;
   font-size: var(--font-size-s);
   white-space: nowrap;
+  text-decoration: none;
 }
 
 .button:hover {
   background-color: var(--colour-interactive-hover);
   border-color: var(--colour-interactive-hover);
   color: var(--colour-interactive);
+  text-decoration: none;
 }
 
 .button:focus {
   outline: none;
   box-shadow: 0 0 0 2px var(--colour-interactive-hover);
   color: var(--colour-interactive);
+  text-decoration: none;
 }
 
 /* Secondary */

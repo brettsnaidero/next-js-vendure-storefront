@@ -55,28 +55,30 @@ const FilterableProductGrid = ({
             ))}
           </div>
 
-          <div>
-            <span>
-              Showing products{' '}
+          <div className={styles.pagination}>
+            Showing products{' '}
+            <strong>
               {translatePaginationFrom(
                 appliedPaginationPage,
                 appliedPaginationLimit,
-              )}{' '}
-              to{' '}
+              )}
+            </strong>{' '}
+            to{' '}
+            <strong>
               {translatePaginationTo(
                 appliedPaginationPage,
                 appliedPaginationLimit,
                 result.search.items.length,
               )}
-            </span>
-            <Pagination
-              basePath={basePath}
-              totalItems={result.search.totalItems}
-              appliedPaginationLimit={appliedPaginationLimit}
-              allowedPaginationLimits={allowedPaginationLimits}
-              appliedPaginationPage={appliedPaginationPage}
-            />
+            </strong>
           </div>
+          <Pagination
+            basePath={basePath}
+            totalItems={result.search.totalItems}
+            appliedPaginationLimit={appliedPaginationLimit}
+            allowedPaginationLimits={allowedPaginationLimits}
+            appliedPaginationPage={appliedPaginationPage}
+          />
         </div>
       ) : (
         <NoResultsHint />

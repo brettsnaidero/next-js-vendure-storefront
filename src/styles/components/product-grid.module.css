@@ -35,5 +35,16 @@
 .price {
   margin-top: var(--spacing-xs);
   font-size: var(--font-size-s);
+  line-height: var(--line-height-s);
   color: var(--colour-text-secondary);
+}
+
+.pagination {
+  font-size: var(--font-size-s);
+  line-height: var(--line-height-s);
+  color: var(--colour-text-secondary);
+}
+
+.pagination strong {
+  color: var(--colour-text);
 }

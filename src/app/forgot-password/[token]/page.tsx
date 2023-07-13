@@ -10,6 +10,7 @@ import Button from '@/components/button';
 import Field from '@/components/form/field';
 import Input from '@/components/form/input';
 import styles from '@/styles/pages/forgot-password.module.css';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export const validator = z
   .object({
@@ -25,7 +26,6 @@ export const validator = z
   );
 
 interface ResetPasswordForm {
-  token: string;
   newPassword: string;
   passwordConfirm: string;
 }
@@ -37,6 +37,8 @@ const ResetPassword = ({
     token: string;
   };
 }) => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [resetPassword, { loading, data, error }] = useResetPasswordMutation();
 
   const {
@@ -44,8 +46,8 @@ const ResetPassword = ({
     register,
     formState: { errors, isValid },
   } = useForm<ResetPasswordForm>({
+    resolver: zodResolver(validator),
     defaultValues: {
-      token: params.token,
       newPassword: '',
       passwordConfirm: '',
     },
@@ -60,15 +62,18 @@ const ResetPassword = ({
     });
   };
 
+  // Redirect user if all went well
   useEffect(() => {
-    if (data?.resetPassword?.__typename === 'CurrentUser') {
-      // TODO
+    if (data?.resetPassword?.__typename === 'CurrentUser' && !error) {
+      setTimeout(() => {
+        router.push(searchParams.get('redirectTo') || '/');
+      }, 5000);
     }
-  }, [data]);
+  }, [data, router, searchParams, error]);
 
   return (
     <div className={styles.forgot}>
-      <h2>Forgot your password?</h2>
+      <h2>Change password</h2>
 
       <div className={styles.layout}>
         {(!!error ||
@@ -84,7 +89,8 @@ const ResetPassword = ({
         {data?.resetPassword?.__typename === 'CurrentUser' ? (
           <Message
             type="success"
-            text="Your account password has been successfully reset"
+            headingText="Your account password has been successfully reset"
+            text="We will redirect you to the home page in a few seconds"
           />
         ) : (
           <form onSubmit={handleSubmit(onSubmit)}>

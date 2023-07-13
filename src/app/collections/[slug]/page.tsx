@@ -10,6 +10,7 @@ import { CollectionQuery } from '@/providers/collections/collections';
 import { CollectionQuery as CollectionQueryType } from '@/graphql-types.generated';
 import useFilteredProductSearch from '@/utils/use-filtered-product-search';
 import styles from '@/styles/pages/collections.module.css';
+import Message from '@/components/message';
 
 // import { APP_META_TITLE } from '@/constants';
 
@@ -57,7 +58,7 @@ const CollectionSlug = ({ params }: { params: { slug: string } }) => {
   if (error || !data?.collection) {
     return (
       <div>
-        <h2>Collection not found!</h2>
+        <Message type="error" text="Collection not found" />
       </div>
     );
   }

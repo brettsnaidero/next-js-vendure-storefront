@@ -65,7 +65,7 @@ const CheckoutPayment = () => {
             {braintreeError ? (
               <div>
                 <p>Braintree error:</p>
-                <p>{braintreeError.message}</p>
+                <Message type="error" text={braintreeError.message} />
               </div>
             ) : (
               <BraintreeDropIn
@@ -85,15 +85,15 @@ const CheckoutPayment = () => {
             {stripeError ? (
               <div>
                 <p>Stripe error:</p>
-                <p>{stripeError.message}</p>
+                <Message type="error" text={stripeError.message} />
               </div>
             ) : (
               <StripePayments
                 orderCode={activeOrder.code}
                 clientSecret={stripeIntent}
                 publishableKey={stripeKey}
-                // setProcessing={setProcessing}
-                // processing={processing}
+                setProcessing={setProcessing}
+                processing={processing}
               />
             )}
           </div>

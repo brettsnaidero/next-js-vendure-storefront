@@ -30,6 +30,10 @@
   }
 }
 
+.collections li a:hover {
+  text-decoration: underline;
+}
+
 /* Top */
 .top {
   display: flex;

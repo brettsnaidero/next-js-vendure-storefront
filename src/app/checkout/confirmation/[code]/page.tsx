@@ -89,18 +89,20 @@ const CheckoutConfirmation = ({ params }: { params: { code: string } }) => {
       );
     }
 
-    // ?
     if (error) {
       return (
         <div className={styles.confirmation}>
-          <h3>Please wait while we process your order...</h3>
+          <Message
+            type="info"
+            text="Please wait while we process your order..."
+          />
         </div>
       );
     }
 
     return (
       <div className={styles.confirmation}>
-        <h3>No matching order found</h3>
+        <Message type="info" text="No matching order found" />
       </div>
     );
   }

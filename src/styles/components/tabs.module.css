@@ -1,12 +1,27 @@
 .tabs {
   display: flex;
   justify-content: stretch;
-  padding-bottom: 1px;
+  margin: 0 calc(-1 * var(--spacing-xs));
+  position: relative;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  width: 100%;
+}
+
+.tabs:after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: var(--spacing-xs);
+  width: calc(100% - 2 * var(--spacing-xs));
+  height: 1px;
+  background-color: var(--colour-outline);
 }
 
 .tab {
   position: relative;
   flex-grow: 1;
+  margin: 0 var(--spacing-xs);
 }
 
 .tab:after {
@@ -18,38 +33,39 @@
   height: 1px;
 }
 
-.tab:hover:after {
-  background-color: var(--colour-outline);
-}
-
-.tab.active:after {
-  background-color: var(--colour-outline);
-}
-
-.tab:first-of-type .link {
-  border-top-left-radius: var(--border-radius-m);
-}
-
-.tab:last-of-type .link {
-  border-top-right-radius: var(--border-radius-m);
-}
-
 .link {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: var(--spacing-m);
-  background-color: var(--colour-input-background);
+  padding: var(--spacing-m) var(--spacing-s);
+  background-color: var(--colour-background);
   font-size: var(--font-size-s);
-  line-height: var(--line-height-s);
+  border: 1px solid transparent;
+  line-height: 30px;
+  height: 30px;
+  border-radius: 15px 15px 0 0;
+  white-space: nowrap;
 }
 
 .link svg {
   display: block;
   width: 16px;
   height: 16px;
-  margin-right: var(--spacing-s);
+  margin-right: var(--spacing-xs);
   color: var(--colour-text-secondary);
+}
+
+.tab:hover .link {
+  background-color: var(--colour-input-background);
+}
+
+.tab.active .link {
+  background-color: var(--colour-input-background);
+  border-color: var(--colour-outline);
+}
+
+.tab.active .link svg {
+  color: var(--colour-brand);
 }
 
 .content {
