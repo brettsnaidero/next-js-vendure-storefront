@@ -57,6 +57,10 @@ const CheckoutPayment = () => {
     return <Message text="Sorry, there was an error" type="error" />;
   }
 
+  if (!data?.eligiblePaymentMethods) {
+    return <LoadingPage />;
+  }
+
   return (
     <div>
       {data?.eligiblePaymentMethods?.map((paymentMethod) =>

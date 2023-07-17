@@ -3393,6 +3393,8 @@ export type ActiveChannelQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type ActiveChannelQuery = { __typename?: 'Query', activeChannel: { __typename?: 'Channel', id: string, currencyCode: CurrencyCode } };
 
+export type EligibleShippingMethodsFragmentFragment = { __typename?: 'ShippingMethodQuote', id: string, name: string, description: string, metadata?: any | null, price: any, priceWithTax: any };
+
 export type EligibleShippingMethodsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -3408,10 +3410,17 @@ export type NextOrderStatesQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type NextOrderStatesQuery = { __typename?: 'Query', nextOrderStates: Array<string> };
 
+export type AvailableCountriesFragmentFragment = { __typename?: 'Country', id: string, name: string, code: string };
+
 export type AvailableCountriesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type AvailableCountriesQuery = { __typename?: 'Query', availableCountries: Array<{ __typename?: 'Country', id: string, name: string, code: string }> };
+
+export type CheckoutShippingQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type CheckoutShippingQuery = { __typename?: 'Query', eligibleShippingMethods: Array<{ __typename?: 'ShippingMethodQuote', id: string, name: string, description: string, metadata?: any | null, price: any, priceWithTax: any }>, availableCountries: Array<{ __typename?: 'Country', id: string, name: string, code: string }> };
 
 export type AddPaymentToOrderMutationVariables = Exact<{
   input: PaymentInput;
@@ -3450,17 +3459,12 @@ export type CollectionQueryVariables = Exact<{
 
 export type CollectionQuery = { __typename?: 'Query', collection?: { __typename?: 'Collection', id: string, name: string, slug: string, breadcrumbs: Array<{ __typename?: 'CollectionBreadcrumb', id: string, name: string, slug: string }>, children?: Array<{ __typename?: 'Collection', id: string, name: string, slug: string, featuredAsset?: { __typename?: 'Asset', id: string, preview: string } | null }> | null } | null };
 
+export type ActiveCustomerAddressesFragment = { __typename?: 'Address', id: string, company?: string | null, fullName?: string | null, streetLine1: string, streetLine2?: string | null, city?: string | null, province?: string | null, postalCode?: string | null, phoneNumber?: string | null, defaultShippingAddress?: boolean | null, defaultBillingAddress?: boolean | null, country: { __typename?: 'Country', id: string, code: string, name: string } };
+
 export type ActiveCustomerQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type ActiveCustomerQuery = { __typename?: 'Query', activeCustomer?: { __typename?: 'Customer', id: string, title?: string | null, firstName: string, lastName: string, phoneNumber?: string | null, emailAddress: string } | null };
-
-export type ActiveCustomerAddressesFragment = { __typename?: 'Address', id: string, company?: string | null, fullName?: string | null, streetLine1: string, streetLine2?: string | null, city?: string | null, province?: string | null, postalCode?: string | null, phoneNumber?: string | null, defaultShippingAddress?: boolean | null, defaultBillingAddress?: boolean | null, country: { __typename?: 'Country', id: string, code: string, name: string } };
-
-export type ActiveCustomerAddressesQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type ActiveCustomerAddressesQuery = { __typename?: 'Query', activeCustomer?: { __typename?: 'Customer', id: string, addresses?: Array<{ __typename?: 'Address', id: string, company?: string | null, fullName?: string | null, streetLine1: string, streetLine2?: string | null, city?: string | null, province?: string | null, postalCode?: string | null, phoneNumber?: string | null, defaultShippingAddress?: boolean | null, defaultBillingAddress?: boolean | null, country: { __typename?: 'Country', id: string, code: string, name: string } }> | null } | null };
+export type ActiveCustomerQuery = { __typename?: 'Query', activeCustomer?: { __typename?: 'Customer', id: string, title?: string | null, firstName: string, lastName: string, phoneNumber?: string | null, emailAddress: string, addresses?: Array<{ __typename?: 'Address', id: string, company?: string | null, fullName?: string | null, streetLine1: string, streetLine2?: string | null, city?: string | null, province?: string | null, postalCode?: string | null, phoneNumber?: string | null, defaultShippingAddress?: boolean | null, defaultBillingAddress?: boolean | null, country: { __typename?: 'Country', id: string, code: string, name: string } }> | null } | null };
 
 export type ActiveCustomerOrderListQueryVariables = Exact<{
   orderListOptions?: InputMaybe<OrderListOptions>;
@@ -3553,6 +3557,23 @@ export type SearchFacetValuesQueryVariables = Exact<{
 
 export type SearchFacetValuesQuery = { __typename?: 'Query', search: { __typename?: 'SearchResponse', totalItems: number, facetValues: Array<{ __typename?: 'FacetValueResult', count: number, facetValue: { __typename?: 'FacetValue', id: string, name: string, facet: { __typename?: 'Facet', id: string, name: string } } }> } };
 
+export const EligibleShippingMethodsFragmentFragmentDoc = gql`
+    fragment EligibleShippingMethodsFragment on ShippingMethodQuote {
+  id
+  name
+  description
+  metadata
+  price
+  priceWithTax
+}
+    `;
+export const AvailableCountriesFragmentFragmentDoc = gql`
+    fragment AvailableCountriesFragment on Country {
+  id
+  name
+  code
+}
+    `;
 export const ActiveCustomerAddressesFragmentDoc = gql`
     fragment ActiveCustomerAddresses on Address {
   id
@@ -4353,12 +4374,10 @@ export type NextOrderStatesQueryResult = Apollo.QueryResult<NextOrderStatesQuery
 export const AvailableCountriesDocument = gql`
     query availableCountries {
   availableCountries {
-    id
-    name
-    code
+    ...AvailableCountriesFragment
   }
 }
-    `;
+    ${AvailableCountriesFragmentFragmentDoc}`;
 
 /**
  * __useAvailableCountriesQuery__
@@ -4386,6 +4405,44 @@ export function useAvailableCountriesLazyQuery(baseOptions?: Apollo.LazyQueryHoo
 export type AvailableCountriesQueryHookResult = ReturnType<typeof useAvailableCountriesQuery>;
 export type AvailableCountriesLazyQueryHookResult = ReturnType<typeof useAvailableCountriesLazyQuery>;
 export type AvailableCountriesQueryResult = Apollo.QueryResult<AvailableCountriesQuery, AvailableCountriesQueryVariables>;
+export const CheckoutShippingDocument = gql`
+    query checkoutShipping {
+  eligibleShippingMethods {
+    ...EligibleShippingMethodsFragment
+  }
+  availableCountries {
+    ...AvailableCountriesFragment
+  }
+}
+    ${EligibleShippingMethodsFragmentFragmentDoc}
+${AvailableCountriesFragmentFragmentDoc}`;
+
+/**
+ * __useCheckoutShippingQuery__
+ *
+ * To run a query within a React component, call `useCheckoutShippingQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCheckoutShippingQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCheckoutShippingQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useCheckoutShippingQuery(baseOptions?: Apollo.QueryHookOptions<CheckoutShippingQuery, CheckoutShippingQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CheckoutShippingQuery, CheckoutShippingQueryVariables>(CheckoutShippingDocument, options);
+      }
+export function useCheckoutShippingLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CheckoutShippingQuery, CheckoutShippingQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CheckoutShippingQuery, CheckoutShippingQueryVariables>(CheckoutShippingDocument, options);
+        }
+export type CheckoutShippingQueryHookResult = ReturnType<typeof useCheckoutShippingQuery>;
+export type CheckoutShippingLazyQueryHookResult = ReturnType<typeof useCheckoutShippingLazyQuery>;
+export type CheckoutShippingQueryResult = Apollo.QueryResult<CheckoutShippingQuery, CheckoutShippingQueryVariables>;
 export const AddPaymentToOrderDocument = gql`
     mutation addPaymentToOrder($input: PaymentInput!) {
   addPaymentToOrder(input: $input) {
@@ -4628,9 +4685,12 @@ export const ActiveCustomerDocument = gql`
     lastName
     phoneNumber
     emailAddress
+    addresses {
+      ...ActiveCustomerAddresses
+    }
   }
 }
-    `;
+    ${ActiveCustomerAddressesFragmentDoc}`;
 
 /**
  * __useActiveCustomerQuery__
@@ -4658,43 +4718,6 @@ export function useActiveCustomerLazyQuery(baseOptions?: Apollo.LazyQueryHookOpt
 export type ActiveCustomerQueryHookResult = ReturnType<typeof useActiveCustomerQuery>;
 export type ActiveCustomerLazyQueryHookResult = ReturnType<typeof useActiveCustomerLazyQuery>;
 export type ActiveCustomerQueryResult = Apollo.QueryResult<ActiveCustomerQuery, ActiveCustomerQueryVariables>;
-export const ActiveCustomerAddressesDocument = gql`
-    query activeCustomerAddresses {
-  activeCustomer {
-    id
-    addresses {
-      ...ActiveCustomerAddresses
-    }
-  }
-}
-    ${ActiveCustomerAddressesFragmentDoc}`;
-
-/**
- * __useActiveCustomerAddressesQuery__
- *
- * To run a query within a React component, call `useActiveCustomerAddressesQuery` and pass it any options that fit your needs.
- * When your component renders, `useActiveCustomerAddressesQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useActiveCustomerAddressesQuery({
- *   variables: {
- *   },
- * });
- */
-export function useActiveCustomerAddressesQuery(baseOptions?: Apollo.QueryHookOptions<ActiveCustomerAddressesQuery, ActiveCustomerAddressesQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<ActiveCustomerAddressesQuery, ActiveCustomerAddressesQueryVariables>(ActiveCustomerAddressesDocument, options);
-      }
-export function useActiveCustomerAddressesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ActiveCustomerAddressesQuery, ActiveCustomerAddressesQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<ActiveCustomerAddressesQuery, ActiveCustomerAddressesQueryVariables>(ActiveCustomerAddressesDocument, options);
-        }
-export type ActiveCustomerAddressesQueryHookResult = ReturnType<typeof useActiveCustomerAddressesQuery>;
-export type ActiveCustomerAddressesLazyQueryHookResult = ReturnType<typeof useActiveCustomerAddressesLazyQuery>;
-export type ActiveCustomerAddressesQueryResult = Apollo.QueryResult<ActiveCustomerAddressesQuery, ActiveCustomerAddressesQueryVariables>;
 export const ActiveCustomerOrderListDocument = gql`
     query activeCustomerOrderList($orderListOptions: OrderListOptions) {
   activeCustomer {

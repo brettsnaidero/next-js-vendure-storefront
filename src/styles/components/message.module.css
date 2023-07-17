@@ -43,7 +43,12 @@
 
 .close {
   display: block;
+  padding-left: var(--spacing-s);
   margin-left: auto;
+}
+
+.message.large .close {
+  padding-left: var(--spacing-m);
 }
 
 .button {
@@ -55,14 +60,24 @@
 
 .button svg {
   display: block;
-  width: 20px;
-  height: 20px;
+  width: 30px;
+  height: 30px;
 }
 
 .icon {
   display: block;
-  width: 20px;
-  height: 20px;
+  width: 30px;
+  height: 30px;
   margin-right: var(--spacing-s);
   color: var(--colour-button-text);
+}
+
+.message.large .icon {
+  margin-right: var(--spacing-m);
+}
+
+.icon svg {
+  display: block;
+  width: 30px;
+  height: 30px;
 }

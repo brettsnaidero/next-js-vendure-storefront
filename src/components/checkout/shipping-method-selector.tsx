@@ -19,7 +19,9 @@ const ShippingMethodSelector = ({
   currencyCode?: CurrencyCode;
 }) => {
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    onChange(event.currentTarget.value);
+    if (event.target.checked) {
+      onChange(event.currentTarget.value);
+    }
   };
 
   return (

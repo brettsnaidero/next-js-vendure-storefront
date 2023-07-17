@@ -1,18 +1,5 @@
 import { gql } from '@apollo/client';
 
-export const ActiveCustomerQuery = gql`
-  query activeCustomer {
-    activeCustomer {
-      id
-      title
-      firstName
-      lastName
-      phoneNumber
-      emailAddress
-    }
-  }
-`;
-
 export const ActiveCustomerAddressesFragment = gql`
   fragment ActiveCustomerAddresses on Address {
     id
@@ -34,10 +21,15 @@ export const ActiveCustomerAddressesFragment = gql`
   }
 `;
 
-export const ActiveCustomerAddressesQuery = gql`
-  query activeCustomerAddresses {
+export const ActiveCustomerQuery = gql`
+  query activeCustomer {
     activeCustomer {
       id
+      title
+      firstName
+      lastName
+      phoneNumber
+      emailAddress
       addresses {
         ...ActiveCustomerAddresses
       }

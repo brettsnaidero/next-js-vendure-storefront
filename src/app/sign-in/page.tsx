@@ -13,7 +13,7 @@ import Checkbox from '@/components/form/checkbox';
 import Message from '@/components/message';
 import { ActiveCustomerContext } from '@/lib/active-customer-wrapper';
 import { useLoginMutation } from '@/graphql-types.generated';
-import { ActiveOrderContext } from '@/lib/active-order-wrapper';
+import { useActiveOrder } from '@/utils/use-active-order';
 
 export interface LogInFormData {
   email: string;
@@ -29,7 +29,7 @@ const SignInPage = () => {
   const [logIn, { data: logInData, loading: logInloading }] =
     useLoginMutation();
 
-  const { refresh } = useContext(ActiveOrderContext);
+  const { refresh } = useActiveOrder();
   const { activeCustomer, refetch } = useContext(ActiveCustomerContext);
 
   const {
@@ -67,7 +67,7 @@ const SignInPage = () => {
       // do nothing
       setInvalidError(true);
     } else if (logInData?.login?.__typename === 'NotVerifiedError') {
-      router.push('/verify-email-address');
+      router.push('/verify');
     }
   }, [logInData, router, searchParams]);
 

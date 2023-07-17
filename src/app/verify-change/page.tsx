@@ -2,8 +2,9 @@
 
 import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
 import { useUpdateCustomerEmailAddressMutation } from '@/graphql-types.generated';
+import Message from '@/components/message';
+import LoadingPage from '@/components/loading';
 
 const VerifyEmailAddressChangeTokenPage = () => {
   const router = useRouter();
@@ -32,36 +33,35 @@ const VerifyEmailAddressChangeTokenPage = () => {
     }
   }, [data, router, searchParams, error]);
 
-  if (!searchParams.get('token')) {
-    router.replace('/');
-
-    return <div>Loading...</div>;
-  }
+  useEffect(() => {}, []);
 
   if (error) {
     return (
-      <div>
-        <div>
-          <XCircleIcon width={20} height={20} aria-hidden="true" />
-        </div>
-        <div>
-          <p>{error?.message}</p>
-        </div>
+      <div className="page">
+        <Message type="error" text={error?.message} />
+      </div>
+    );
+  }
+
+  // TODO: If already logged in, redirect user
+
+  if (!searchParams.get('token')) {
+    return (
+      <div className="page">
+        <Message
+          type="info"
+          text="Your new email address has been not yet been verified. Please check your inbox for your verification link."
+        />
       </div>
     );
   }
 
   return (
-    <div>
-      <div>
-        <CheckCircleIcon width={20} height={20} aria-hidden="true" />
-      </div>
-      <div>
-        <p>
-          Your new email address has been verified successfully. Redirecting in
-          5s...
-        </p>
-      </div>
+    <div className="page">
+      <Message
+        type="success"
+        text="Your new email address has been verified successfully. Redirecting in 5 seconds..."
+      />
     </div>
   );
 };

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSuspenseQuery } from '@apollo/experimental-nextjs-app-support/ssr';
 import { useForm } from 'react-hook-form';
@@ -10,18 +10,18 @@ import {
   AvailableCountriesQuery,
   EligibleShippingMethodsQuery,
 } from '@/providers/checkout/checkout';
-import { ActiveCustomerAddressesQuery } from '@/providers/customer/customer';
 import AddressForm, { ShippingForm } from '@/components/account/address-form';
 import ShippingMethodSelector from '@/components/checkout/shipping-method-selector';
 import ShippingAddressSelector from '@/components/checkout/shipping-address-selector';
 import {
-  ActiveCustomerAddressesQuery as ActiveCustomerAddressesQueryType,
   AvailableCountriesQuery as AvailableCountriesQueryType,
+  AvailableCountriesQueryVariables,
   EligibleShippingMethodsQuery as EligibleShippingMethodsQueryType,
+  EligibleShippingMethodsQueryVariables,
+  ErrorCode,
   useCreateCustomerAddressMutation,
 } from '@/graphql-types.generated';
 import { classNames } from '@/utils/class-names';
-import { useActiveOrder } from '@/utils/use-active-order';
 import Button from '@/components/button';
 import Input from '@/components/form/input';
 import Field from '@/components/form/field';
@@ -32,6 +32,8 @@ import CustomerAddressForm, {
 } from '@/components/account/customer-address-form';
 import styles from '@/styles/pages/checkout.module.css';
 import LoadingPage from '@/components/loading';
+import { ActiveCustomerContext } from '@/lib/active-customer-wrapper';
+import { useActiveOrder } from '@/utils/use-active-order';
 
 interface CustomerForm {
   email: string;
@@ -39,33 +41,36 @@ interface CustomerForm {
   lastName: string;
 }
 
+// TODO: This page is still messed up
 const CheckoutShipping = () => {
   const router = useRouter();
+  // TODO: Should we be using the active order context throughout the app?
   const {
     activeOrder,
     setOrderCustomer,
     setShippingMethod,
     setCheckoutShipping,
     error,
+    refresh,
   } = useActiveOrder();
+  const { activeCustomer } = useContext(ActiveCustomerContext);
 
   const [customerFormChanged, setCustomerFormChanged] = useState(false);
   const [addressFormChanged, setAddressFormChanged] = useState(false);
   const [newAddress, setNewAddress] = useState(false);
+  const [selectedAddressIndex, setSelectedAddressIndex] = useState<number>();
 
-  const [selectedAddressIndex, setSelectedAddressIndex] = useState(0);
+  // These 2 queries need to be separate for some reason
+  // eligibleShippingMethods sometimes is empty when combined
+  const { data: dataAvailableCountries } = useSuspenseQuery<
+    AvailableCountriesQueryType,
+    AvailableCountriesQueryVariables
+  >(AvailableCountriesQuery);
+  const { data } = useSuspenseQuery<
+    EligibleShippingMethodsQueryType,
+    EligibleShippingMethodsQueryVariables
+  >(EligibleShippingMethodsQuery);
 
-  // TODO: Can this be one query?
-  const { data: dataAvailableCountries } =
-    useSuspenseQuery<AvailableCountriesQueryType>(AvailableCountriesQuery);
-  const { data: dataEligibleShippingMethods } =
-    useSuspenseQuery<EligibleShippingMethodsQueryType>(
-      EligibleShippingMethodsQuery,
-    );
-  const { data: dataActiveCustomerAddresses, refetch } =
-    useSuspenseQuery<ActiveCustomerAddressesQueryType>(
-      ActiveCustomerAddressesQuery,
-    );
   const [createCustomerAddress] = useCreateCustomerAddressMutation();
 
   // Customer information form
@@ -81,13 +86,30 @@ const CheckoutShipping = () => {
     },
   });
 
-  const isSignedIn = !!dataActiveCustomerAddresses?.activeCustomer?.id;
+  const isSignedIn = !!activeCustomer?.id;
 
   const defaultFullName =
     activeOrder?.shippingAddress?.fullName ??
     (activeOrder?.customer
       ? `${activeOrder?.customer.firstName} ${activeOrder?.customer.lastName}`
       : ``);
+
+  // TODO: This is a bit full on
+  // There should be a simpler way to achieve this
+  useEffect(() => {
+    const newAddressIndex = activeCustomer?.addresses?.findIndex((address) => {
+      return (
+        address.streetLine1 === activeOrder?.shippingAddress?.streetLine1 &&
+        address.streetLine2 === activeOrder?.shippingAddress?.streetLine2 &&
+        address.company === activeOrder?.shippingAddress?.company &&
+        address.fullName === activeOrder?.shippingAddress?.fullName &&
+        address.city === activeOrder?.shippingAddress?.city &&
+        address.country?.code === activeOrder?.shippingAddress?.countryCode
+      );
+    });
+
+    setSelectedAddressIndex(newAddressIndex);
+  }, [activeCustomer, activeOrder?.shippingAddress]);
 
   const hasAddress = isSignedIn
     ? selectedAddressIndex !== null
@@ -109,7 +131,7 @@ const CheckoutShipping = () => {
     !activeOrder.active ||
     activeOrder.lines.length === 0
   ) {
-    router.push('/');
+    // router.push('/');
 
     return <LoadingPage />;
   }
@@ -120,7 +142,6 @@ const CheckoutShipping = () => {
     firstName,
     lastName,
   }: CustomerForm) => {
-    // TODO: Seems to be failing with "ALREADY_LOGGED_IN_ERROR"
     if (
       customerFormChanged &&
       isValid &&
@@ -143,13 +164,12 @@ const CheckoutShipping = () => {
     setShippingMethod?.(shippingMethodId);
   };
 
-  const changeSelectedAddress = (index: number) => {
-    const selectedAddress =
-      dataActiveCustomerAddresses?.activeCustomer?.addresses?.[index];
+  const changeSelectedAddress = (index: string) => {
+    const numberIndex = parseInt(index, 10);
+
+    const selectedAddress = activeCustomer?.addresses?.[numberIndex];
 
     if (selectedAddress) {
-      setSelectedAddressIndex(index);
-
       setCheckoutShipping?.({
         city: selectedAddress.city ?? undefined,
         company: selectedAddress.company ?? undefined,
@@ -205,7 +225,7 @@ const CheckoutShipping = () => {
       }
 
       // Refetch the customer addresses now
-      refetch();
+      refresh();
     });
   };
 
@@ -221,10 +241,12 @@ const CheckoutShipping = () => {
         {/* Customer information form */}
         {isSignedIn ? (
           <div className={styles.customer}>
+            <div className={styles.customerLabel}>Full name</div>
             <p>
               {activeOrder?.customer?.firstName}{' '}
               {activeOrder?.customer?.lastName}
             </p>
+            <div className={styles.customerLabel}>Email</div>
             <p>{activeOrder?.customer?.emailAddress}</p>
           </div>
         ) : (
@@ -273,10 +295,11 @@ const CheckoutShipping = () => {
               />
             </Field>
 
-            {error?.errorCode === 'EMAIL_ADDRESS_CONFLICT_ERROR' && (
+            {error?.errorCode === ErrorCode.EmailAddressConflictError && (
               <Message type="error" text={error.message} />
             )}
-            {error?.errorCode === 'ALREADY_LOGGED_IN_ERROR' && (
+
+            {error?.errorCode === ErrorCode.AlreadyLoggedInError && (
               <Message type="error" text={error.message} />
             )}
           </form>
@@ -287,11 +310,10 @@ const CheckoutShipping = () => {
         <h3>Shipping information</h3>
 
         {/* Shipping address selector or form */}
-        {isSignedIn &&
-        dataActiveCustomerAddresses?.activeCustomer?.addresses?.length ? (
+        {isSignedIn && activeCustomer?.addresses?.length ? (
           <div>
             <ShippingAddressSelector
-              addresses={dataActiveCustomerAddresses?.activeCustomer?.addresses}
+              addresses={activeCustomer?.addresses}
               selectedAddressIndex={selectedAddressIndex}
               onChange={changeSelectedAddress}
             />
@@ -343,13 +365,9 @@ const CheckoutShipping = () => {
         <h3>Delivery method</h3>
 
         <ShippingMethodSelector
-          eligibleShippingMethods={
-            dataEligibleShippingMethods?.eligibleShippingMethods
-          }
+          eligibleShippingMethods={data?.eligibleShippingMethods ?? []}
           currencyCode={activeOrder?.currencyCode}
-          shippingMethodId={
-            activeOrder?.shippingLines[0]?.shippingMethod.id ?? ''
-          }
+          shippingMethodId={activeOrder?.shippingLines[0]?.shippingMethod.id}
           onChange={changeShippingMethod}
         />
       </div>

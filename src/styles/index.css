@@ -44,6 +44,11 @@ body {
   position: absolute;
 }
 
+/* Generic page */
+.page {
+  padding: var(--spacing-l) 0;
+}
+
 /* Wrapper */
 .wrapper {
   position: relative;

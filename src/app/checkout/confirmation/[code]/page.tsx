@@ -112,15 +112,7 @@ const CheckoutConfirmation = ({ params }: { params: { code: string } }) => {
       <h3>Order Summary</h3>
 
       <div className={styles.block}>
-        <Message
-          type="success"
-          text={`Your order ${data?.orderByCode?.code} has been received!`}
-          icon={<CheckCircleIcon width={20} height={20} />}
-        />
-      </div>
-
-      {data?.orderByCode?.active && (
-        <div className={styles.block}>
+        {data.orderByCode.active ? (
           <Message
             type="info"
             text="Note: your payment is still being processed. You will receive an email confirmation once the payment has completed."
@@ -132,16 +124,66 @@ const CheckoutConfirmation = ({ params }: { params: { code: string } }) => {
               />
             }
           />
+        ) : (
+          <Message
+            type="success"
+            text={`Your order ${data?.orderByCode?.code} has been received!`}
+            icon={<CheckCircleIcon width={20} height={20} />}
+          />
+        )}
+      </div>
+
+      <div className={styles.block}>
+        <div className={styles.information}>
+          <CartContents
+            orderLines={data.orderByCode.lines}
+            currencyCode={data.orderByCode.currencyCode}
+            editable={false}
+          />
+          <CartTotals order={data.orderByCode} />
+        </div>
+      </div>
+
+      {data.orderByCode.shippingAddress && (
+        <div className={styles.information}>
+          <div className={styles.shipping}>
+            <h4>Shipping address</h4>
+            <div className={styles.address}>
+              <div className={styles.label}>Full name</div>
+              <div>{data.orderByCode.shippingAddress.fullName}</div>
+              {data.orderByCode.shippingAddress.company && (
+                <>
+                  <div className={styles.label}>Company</div>
+                  <div>{data.orderByCode.shippingAddress.company}</div>
+                </>
+              )}
+              <div className={styles.label}>Phone</div>
+              <div>{data.orderByCode.shippingAddress.phoneNumber}</div>
+              <div className={styles.label}>Address</div>
+              <div>
+                {data.orderByCode.shippingAddress.streetLine1}
+                {data.orderByCode.shippingAddress.streetLine2 ? (
+                  <>
+                    <br />
+                    {data.orderByCode.shippingAddress.streetLine2}
+                  </>
+                ) : (
+                  ''
+                )}
+              </div>
+              <div className={styles.label}>City</div>
+              <div>{data.orderByCode.shippingAddress.city}</div>
+              <div className={styles.label}>Postcode</div>
+              <div>{data.orderByCode.shippingAddress.postalCode}</div>
+              <div className={styles.label}>State</div>
+              <div>{data.orderByCode.shippingAddress.province}</div>
+              <div className={styles.label}>Country</div>
+              <div>{data.orderByCode.shippingAddress.countryCode}</div>
+            </div>
+          </div>
         </div>
       )}
-      <div className={styles.block}>
-        <CartContents
-          orderLines={data.orderByCode.lines}
-          currencyCode={data.orderByCode.currencyCode}
-          editable={false}
-        />
-        <CartTotals order={data.orderByCode} />
-      </div>
+      {/* TODO: Billing address? */}
     </div>
   );
 };

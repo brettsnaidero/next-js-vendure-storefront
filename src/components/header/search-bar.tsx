@@ -21,8 +21,6 @@ const SearchBar = () => {
     const search = newSearchParams.toString();
     const query = `${'?'.repeat(search.length && 1)}${search}`;
 
-    console.log('Search', searchValue);
-
     router.push(`/search${query}`);
   };
 

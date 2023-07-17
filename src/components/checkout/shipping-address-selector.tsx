@@ -1,9 +1,9 @@
 import React from 'react';
-import { ActiveCustomerAddressesQuery } from '@/graphql-types.generated';
+import { ActiveCustomerQuery } from '@/graphql-types.generated';
 import Radio, { RadioGroup } from '../form/radio';
 
 export type SelectedAddress = NonNullable<
-  NonNullable<ActiveCustomerAddressesQuery['activeCustomer']>['addresses']
+  NonNullable<ActiveCustomerQuery['activeCustomer']>['addresses']
 >[number];
 
 const ShippingAddressSelector = ({
@@ -12,16 +12,18 @@ const ShippingAddressSelector = ({
   onChange,
 }: {
   addresses: SelectedAddress[];
-  selectedAddressIndex: number;
-  onChange: (value: number) => void;
+  selectedAddressIndex?: number;
+  onChange: (value: string) => void;
 }) => {
   const handleChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
-    onChange(+event.target.value);
+    if (event.target.checked) {
+      onChange(event.target.value);
+    }
   };
 
   return (
     <RadioGroup>
-      {(addresses || []).map((address, index) => {
+      {addresses.map((address, index) => {
         const id = `shipping-address-${index}`;
         return (
           <Radio

@@ -83,10 +83,13 @@
 
 .total {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  margin-bottom: var(--spacing-s);
+  grid-template-columns: minmax(120px, 20%) 1fr;
   font-size: var(--font-size-m);
   line-height: var(--line-height-m);
+}
+
+.total:not(:last-of-type) {
+  margin-bottom: var(--spacing-s);
 }
 
 .calculated {

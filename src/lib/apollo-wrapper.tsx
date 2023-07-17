@@ -1,4 +1,5 @@
 'use client';
+
 import {
   ApolloClient,
   ApolloLink,
@@ -16,6 +17,10 @@ const vendureApi = process.env.NEXT_PUBLIC_VENDURE_SHOP_API;
 const authTokenKey = process.env.NEXT_PUBLIC_AUTH_TOKEN_KEY as string;
 
 let token: string;
+
+// TODO: Should we be using session storage or local storage?
+// "the difference is that while data in localStorage doesn't expire,
+// data in sessionStorage is cleared when the page session ends."
 
 export function ApolloWrapper({
   children,
@@ -45,7 +50,7 @@ export function ApolloWrapper({
         };
       }
 
-      const localAuthToken = localStorage.getItem(authTokenKey);
+      const localAuthToken = sessionStorage.getItem(authTokenKey);
 
       if (localAuthToken) {
         // If we have stored the authToken from a previous
@@ -69,7 +74,7 @@ export function ApolloWrapper({
           } else {
             // If the auth token has been returned by the Vendure
             // server, we store it in localStorage
-            localStorage.setItem(authTokenKey, authHeader);
+            sessionStorage.setItem(authTokenKey, authHeader);
           }
         }
         return response;

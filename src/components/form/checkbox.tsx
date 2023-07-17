@@ -14,7 +14,6 @@ const Checkbox = forwardRef<
     value?: string | number;
   }
 >(function CheckboxInner({ children, ...props }, ref) {
-  console.log(props.checked);
   return (
     <div
       className={clsx([

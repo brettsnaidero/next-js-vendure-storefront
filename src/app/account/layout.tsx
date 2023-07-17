@@ -14,11 +14,11 @@ import { useContext, useEffect } from 'react';
 import Button from '@/components/button';
 import styles from '@/styles/pages/account.module.css';
 import { ActiveCustomerContext } from '@/lib/active-customer-wrapper';
-import { ActiveOrderContext } from '@/lib/active-order-wrapper';
+import { useActiveOrder } from '@/utils/use-active-order';
 
 const AccountDashboard = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
-  const { refresh } = useContext(ActiveOrderContext);
+  const { refresh } = useActiveOrder();
   const { activeCustomer, refetch } = useContext(ActiveCustomerContext);
   const [logOut, { data: logOutData }] = useLogoutMutation();
 

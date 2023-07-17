@@ -43,6 +43,9 @@
 
 /* Information */
 .information {
+  padding: var(--spacing-m);
+  border-radius: var(--border-radius-l);
+  border: 1px solid var(--colour-outline);
   margin-bottom: var(--spacing-m);
 }
 
@@ -84,15 +87,22 @@
 }
 
 /* Customer */
-.customer {
+.customer p:not(:last-of-type) {
   margin-bottom: var(--spacing-m);
+}
+
+.customerLabel {
+  font-size: var(--font-size-s);
+  line-height: var(--line-height-s);
+  color: var(--colour-text-secondary);
+  margin-bottom: var(--spacing-xs);
 }
 
 .label span {
 }
 
 .add {
-  margin-top: var(--spacing-s);
+  margin-top: var(--spacing-m);
 }
 
 /* Confirmation */
@@ -108,4 +118,23 @@
 
 .block {
   margin-top: var(--spacing-m);
+}
+
+.shipping {
+}
+
+.shipping h4 {
+  font-size: var(--font-size-s);
+  line-height: var(--line-height-s);
+  color: var(--colour-text-secondary);
+}
+
+.address {
+  display: grid;
+  grid-template-columns: minmax(120px, 20%) 1fr;
+  grid-gap: var(--spacing-s);
+  margin-top: var(--spacing-s);
+}
+
+.label {
 }
