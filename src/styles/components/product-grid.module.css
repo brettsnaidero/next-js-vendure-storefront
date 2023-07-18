@@ -48,3 +48,7 @@
 .pagination strong {
   color: var(--colour-text);
 }
+
+.nothing {
+  padding: var(--spacing-l) 0;
+}

@@ -81,7 +81,9 @@ const FilterableProductGrid = ({
           />
         </div>
       ) : (
-        <NoResultsHint />
+        <div className={styles.nothing}>
+          <NoResultsHint facetFilterTracker={facetValuesTracker?.current} />
+        </div>
       )}
     </div>
   );
