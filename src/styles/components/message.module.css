@@ -33,6 +33,7 @@
 
 .text {
   flex-grow: 1;
+  align-self: center;
 }
 
 .heading {
@@ -52,10 +53,12 @@
 }
 
 .button {
+  display: block;
   padding: 0;
   border: 0;
   background: none;
   color: var(--colour-text);
+  cursor: pointer;
 }
 
 .button svg {

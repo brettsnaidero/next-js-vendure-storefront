@@ -4,7 +4,11 @@ import React, { useContext, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { ArrowPathIcon } from '@heroicons/react/24/solid';
+import { AnimatePresence } from 'framer-motion';
+import {
+  ArrowPathIcon,
+  ExclamationTriangleIcon,
+} from '@heroicons/react/24/solid';
 import Button from '@/components/button';
 import styles from '@/styles/pages/sign-in.module.css';
 import Field from '@/components/form/field';
@@ -132,15 +136,18 @@ const SignInPage = () => {
                 <Link href="/forgot-password">Forgot your password?</Link>
               </div>
 
-              {invalidError && (
-                <div className={styles.block}>
-                  <Message
-                    type="error"
-                    text="Sorry, we couldn't log you in."
-                    closable
-                  />
-                </div>
-              )}
+              <AnimatePresence>
+                {invalidError && (
+                  <div className={styles.block}>
+                    <Message
+                      type="error"
+                      text="Sorry, we couldn't log you in."
+                      icon={<ExclamationTriangleIcon width={20} height={20} />}
+                      closableCallback={() => setInvalidError(false)}
+                    />
+                  </div>
+                )}
+              </AnimatePresence>
 
               <div className={styles.block}>
                 <Button

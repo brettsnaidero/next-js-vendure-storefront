@@ -41,10 +41,10 @@ interface CustomerForm {
   lastName: string;
 }
 
-// TODO: This page is still messed up
+const authTokenKey = process.env.NEXT_PUBLIC_AUTH_TOKEN_KEY as string;
+
 const CheckoutShipping = () => {
   const router = useRouter();
-  // TODO: Should we be using the active order context throughout the app?
   const {
     activeOrder,
     setOrderCustomer,
@@ -124,14 +124,16 @@ const CheckoutShipping = () => {
     activeOrder?.shippingLines?.length &&
     activeOrder?.lines?.length;
 
+  const session = sessionStorage.getItem(authTokenKey);
+
   // If there is no active order, redirect to the home page
   if (
-    // !session ||
+    !session ||
     !activeOrder ||
     !activeOrder.active ||
     activeOrder.lines.length === 0
   ) {
-    // router.push('/');
+    router.push('/');
 
     return <LoadingPage />;
   }
